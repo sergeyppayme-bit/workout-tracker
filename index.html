@@ -85,7 +85,9 @@
   .ex-head-text { flex: 1; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .ex-head strong { font-size: 14px; font-weight: 650; color: var(--text); line-height: 1.25; }
   .ex-head span { flex-shrink: 0; font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-  .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 10px; }
+  .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+  .ex-muscle { font-size: 11px; color: var(--text-faint); margin-bottom: 10px; }
+  .ex-muscle b { color: var(--text-dim); font-weight: 600; }
   .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
   .grid-row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; margin-bottom: 5px; }
   .grid-row span { font-size: 12.5px; align-self: center; color: var(--text-dim); font-variant-numeric: tabular-nums; }
@@ -162,39 +164,50 @@
 <script>
 const DAY_COLORS = { A: "#e8863a", B: "#4f8ff0", C: "#39b787" };
 
-/* Схематичные пиктограммы техники — не фото (авторские фото использовать нельзя),
-   но показывают позу и траекторию движения на старте/финише упражнения. */
-const ICON_ATTRS = 'viewBox="0 0 40 40" fill="none" stroke="#aeaeb6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
-const ICONS = {
-  legPress: `<circle cx="10" cy="10" r="3.2"/><path d="M10 13 L14 24"/><path d="M10 13 L6 19"/><path d="M14 24 L22 20 L30 12"/><rect x="30" y="4" width="3" height="16" fill="var(--dayColor)" stroke="none"/>`,
-  pulldown: `<path d="M8 4 L32 4" stroke="var(--dayColor)" stroke-width="3"/><circle cx="20" cy="9" r="3.2"/><path d="M20 12 L11 5"/><path d="M20 12 L29 5"/><path d="M20 12 L20 27"/><path d="M20 27 L15 37"/><path d="M20 27 L26 37"/>`,
-  chestPress: `<line x1="4" y1="24" x2="30" y2="24" stroke="var(--dayColor)" stroke-width="2"/><circle cx="8" cy="18" r="3.2"/><path d="M11 19 L26 19"/><path d="M18 19 L18 8"/><circle cx="18" cy="7" r="2.2" fill="var(--dayColor)" stroke="none"/><path d="M26 19 L30 25 L26 29"/>`,
-  legCurl: `<line x1="4" y1="16" x2="30" y2="16" stroke="var(--dayColor)" stroke-width="2"/><circle cx="8" cy="10" r="3.2"/><path d="M11 11 L26 12"/><path d="M14 11 L11 17"/><path d="M26 12 L30 16 L26 8"/><rect x="24" y="5" width="4" height="4" fill="var(--dayColor)" stroke="none"/>`,
-  bentRow: `<circle cx="12" cy="8" r="3.2"/><path d="M12 11 L20 22"/><path d="M20 22 L17 36"/><path d="M20 22 L25 34"/><path d="M14 14 L10 20 L8 27"/><circle cx="8" cy="27" r="2.2" fill="var(--dayColor)" stroke="none"/>`,
-  lateralRaise: `<circle cx="20" cy="8" r="3.2"/><path d="M20 11 L20 26"/><path d="M20 26 L14 38"/><path d="M20 26 L26 38"/><path d="M20 15 L6 13"/><path d="M20 15 L34 13"/><circle cx="6" cy="13" r="2.2" fill="var(--dayColor)" stroke="none"/><circle cx="34" cy="13" r="2.2" fill="var(--dayColor)" stroke="none"/>`,
-  calfRaise: `<circle cx="20" cy="6" r="3.2"/><path d="M20 9 L20 26"/><path d="M20 14 L14 22"/><path d="M20 14 L26 22"/><path d="M20 26 L17 36 L14 37"/><path d="M20 26 L23 36 L26 37"/><path d="M30 30 L30 20" stroke="var(--dayColor)"/><path d="M27 23 L30 19 L33 23" stroke="var(--dayColor)"/>`,
-  wristCurl: `<line x1="4" y1="24" x2="26" y2="24" stroke="var(--dayColor)" stroke-width="2"/><path d="M6 22 L24 20"/><path d="M24 20 L24 10" stroke="var(--dayColor)" stroke-width="3"/><path d="M28 14 A6 6 0 0 1 28 22" stroke-dasharray="2 3"/>`,
-  seatedRow: `<circle cx="12" cy="8" r="3.2"/><path d="M12 11 L12 24"/><path d="M12 24 L22 26 L30 26"/><path d="M12 15 L22 13 L28 10"/><rect x="34" y="8" width="3" height="6" fill="var(--dayColor)" stroke="none"/><path d="M28 10 L34 10"/>`,
-  legExtension: `<circle cx="10" cy="8" r="3.2"/><path d="M10 11 L10 22"/><path d="M6 14 L10 12"/><path d="M10 22 L20 22"/><path d="M20 22 L28 14"/><rect x="27" y="11" width="3" height="4" fill="var(--dayColor)" stroke="none"/><path d="M10 22 L10 32"/>`,
-  shoulderPress: `<circle cx="20" cy="10" r="3.2"/><path d="M20 13 L20 26"/><path d="M20 26 L16 37"/><path d="M20 26 L24 37"/><path d="M20 16 L14 9"/><path d="M20 16 L26 9"/><circle cx="14" cy="9" r="2.2" fill="var(--dayColor)" stroke="none"/><circle cx="26" cy="9" r="2.2" fill="var(--dayColor)" stroke="none"/>`,
-  hipThrust: `<line x1="4" y1="33" x2="14" y2="33" stroke="var(--dayColor)" stroke-width="2"/><circle cx="8" cy="30" r="3.2"/><path d="M11 30 L22 20"/><path d="M22 20 L30 28"/><path d="M30 28 L30 36"/><path d="M18 19 L27 19" stroke="var(--dayColor)" stroke-width="3"/>`,
-  pecDeck: `<circle cx="20" cy="8" r="3.2"/><path d="M20 11 L20 26"/><path d="M20 26 L16 37"/><path d="M20 26 L24 37"/><path d="M8 16 Q20 23 32 16"/><circle cx="8" cy="16" r="2.2" fill="var(--dayColor)" stroke="none"/><circle cx="32" cy="16" r="2.2" fill="var(--dayColor)" stroke="none"/>`,
-  bicepCurl: `<circle cx="20" cy="8" r="3.2"/><path d="M20 11 L20 26"/><path d="M20 26 L16 38"/><path d="M20 26 L24 38"/><path d="M20 14 L20 22"/><path d="M20 22 L14 15"/><circle cx="14" cy="15" r="2.2" fill="var(--dayColor)" stroke="none"/><path d="M20 14 L26 24"/>`,
-  tricepExtension: `<line x1="4" y1="30" x2="24" y2="30" stroke="var(--dayColor)" stroke-width="2"/><circle cx="8" cy="26" r="3.2"/><path d="M11 26 L22 26"/><path d="M20 26 L20 13 L14 7"/><path d="M9 6 L18 6" stroke="var(--dayColor)" stroke-width="3"/>`,
-  deadHang: `<path d="M8 6 L32 6" stroke="var(--dayColor)" stroke-width="3"/><path d="M12 6 L18 15"/><path d="M28 6 L22 15"/><circle cx="20" cy="18" r="3.2"/><path d="M20 21 L20 33"/><path d="M20 33 L17 42"/><path d="M20 33 L23 42"/>`,
+/* Схема тела с подсветкой рабочих мышечных групп (силуэт сбоку, лицом вправо:
+   зоны ближе к "переду" — грудь/пресс/бицепс/квадрицепс, зоны ближе к "спине" — 
+   спина/трицепс/бицепс бедра/икры/ягодицы). Не фото — собственная отрисовка. */
+const BODY_BASE = `<circle cx="16" cy="7" r="3.3" fill="#35353c"/><rect x="12" y="10.5" width="8" height="12" rx="3.5" fill="#35353c"/><rect x="19" y="13" width="3" height="11" rx="1.5" fill="#35353c"/><rect x="12.5" y="22" width="6" height="15" rx="3" fill="#35353c"/><rect x="12" y="37" width="6" height="2" rx="1" fill="#35353c"/>`;
+const MUSCLE_ZONES = {
+  chest: 'cx="18.5" cy="14" rx="2.3" ry="2.6"',
+  abs: 'cx="18" cy="19.5" rx="2" ry="2.8"',
+  upperBack: 'cx="13.5" cy="13" rx="2" ry="2.6"',
+  shoulders: 'cx="19.5" cy="11.5" rx="2.1" ry="2.1"',
+  biceps: 'cx="21.3" cy="16.5" rx="1.6" ry="2.2"',
+  triceps: 'cx="19.3" cy="16.5" rx="1.4" ry="2.2"',
+  forearm: 'cx="20.5" cy="21.5" rx="1.6" ry="2.4"',
+  glutes: 'cx="13" cy="22.5" rx="2.3" ry="2.3"',
+  quads: 'cx="17" cy="26" rx="2.2" ry="3.3"',
+  hamstrings: 'cx="13.5" cy="26" rx="1.8" ry="3.3"',
+  calves: 'cx="13.5" cy="33.5" rx="1.8" ry="2.6"',
 };
-function svgIcon(key) {
-  const inner = ICONS[key];
-  if (!inner) return "";
-  return `<svg ${ICON_ATTRS} width="26" height="26">${inner}</svg>`;
+const MUSCLE_NAMES = {
+  chest: "грудь", abs: "пресс", upperBack: "спина", shoulders: "плечи",
+  biceps: "бицепс", triceps: "трицепс", forearm: "предплечье", glutes: "ягодицы",
+  quads: "квадрицепс", hamstrings: "бицепс бедра", calves: "икры",
+};
+function bodyIcon(primary, secondary) {
+  let overlay = "";
+  if (secondary && MUSCLE_ZONES[secondary]) overlay += `<ellipse ${MUSCLE_ZONES[secondary]} fill="var(--dayColor)" fill-opacity="0.4"/>`;
+  if (primary && MUSCLE_ZONES[primary]) overlay += `<ellipse ${MUSCLE_ZONES[primary]} fill="var(--dayColor)"/>`;
+  return `<svg viewBox="0 0 40 40" width="30" height="30">${BODY_BASE}${overlay}</svg>`;
 }
-const EX_ICON = {
-  a1: "legPress", a2: "pulldown", a3: "chestPress", a4: "legCurl", a5: "bentRow",
-  a6: "lateralRaise", a7: "calfRaise", a8: "wristCurl",
-  b1: "legPress", b2: "seatedRow", b3: "chestPress", b4: "legExtension", b5: "seatedRow",
-  b6: "shoulderPress", b7: "calfRaise", b8: "wristCurl",
-  c1: "hipThrust", c2: "bentRow", c3: "pecDeck", c4: "legCurl", c5: "bicepCurl",
-  c6: "tricepExtension", c7: "calfRaise", c8: "deadHang",
+function muscleLabel(primary, secondary) {
+  const parts = [];
+  if (primary) parts.push(`<b>${MUSCLE_NAMES[primary]}</b>`);
+  if (secondary) parts.push(MUSCLE_NAMES[secondary]);
+  return parts.join(", ");
+}
+const EX_MUSCLES = {
+  a1: ["quads", "glutes"], a2: ["upperBack", "biceps"], a3: ["chest", "triceps"],
+  a4: ["hamstrings", null], a5: ["upperBack", "biceps"], a6: ["shoulders", null],
+  a7: ["calves", null], a8: ["forearm", null],
+  b1: ["quads", "glutes"], b2: ["upperBack", "biceps"], b3: ["chest", "triceps"],
+  b4: ["quads", null], b5: ["upperBack", "biceps"], b6: ["shoulders", "triceps"],
+  b7: ["calves", null], b8: ["forearm", null],
+  c1: ["glutes", "hamstrings"], c2: ["upperBack", "biceps"], c3: ["chest", null],
+  c4: ["hamstrings", null], c5: ["biceps", null], c6: ["triceps", null],
+  c7: ["calves", null], c8: ["forearm", "upperBack"],
 };
 
 const PROGRAM = {
@@ -284,10 +297,11 @@ function renderExercises() {
     div.style.setProperty("--dayColor", dayColor);
     div.innerHTML = `
       <div class="ex-head">
-        <div class="ex-icon">${svgIcon(EX_ICON[ex.id])}</div>
+        <div class="ex-icon">${bodyIcon(...(EX_MUSCLES[ex.id] || []))}</div>
         <div class="ex-head-text"><strong>${ex.name}</strong><span>${ex.rest}</span></div>
       </div>
       <div class="ex-meta">${ex.sets}×${ex.reps}${ex.hint ? " · ориентир " + ex.hint : ""}</div>
+      <div class="ex-muscle">Целевые мышцы: ${muscleLabel(...(EX_MUSCLES[ex.id] || []))}</div>
       <div class="grid-head"><span>#</span><span>кг</span><span>повторы</span></div>
     `;
     log[ex.id].forEach((s, i) => {
