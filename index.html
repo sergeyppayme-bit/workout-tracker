@@ -128,6 +128,27 @@
   h3 { font-size: 13.5px; font-weight: 700; margin: 4px 0 10px; color: var(--text); }
 
   .footer { font-size: 11px; color: var(--text-faint); text-align: center; margin-top: 20px; line-height: 1.5; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+    opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  .modal-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    padding: 26px 22px; max-width: 320px; width: 100%; text-align: center;
+    transform: scale(0.9) translateY(6px); transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .modal-overlay.show .modal-card { transform: scale(1) translateY(0); }
+  .modal-check {
+    width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 14px;
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px -4px rgba(34,197,94,0.5);
+  }
+  .modal-title { font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .modal-quote { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; font-style: italic; }
 </style>
 </head>
 <body>
@@ -162,6 +183,16 @@
 </div>
 
 <p class="footer">История сохраняется на этом устройстве (localStorage) и не пропадёт при перезакрытии Safari.</p>
+
+<div class="modal-overlay" id="successModal">
+  <div class="modal-card">
+    <div class="modal-check">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0a2e15" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div class="modal-title">Тренировка сохранена</div>
+    <div class="modal-quote" id="successQuote"></div>
+  </div>
+</div>
 
 <script>
 const DAY_COLORS = { A: "#e8863a", B: "#4f8ff0", C: "#39b787" };
@@ -362,6 +393,32 @@ function renderWorkout() {
   renderExercises();
 }
 
+const MOTIVATION_QUOTES = [
+  "Ещё один шаг к цели закрыт.",
+  "Сделано. Тело помнит каждый подход.",
+  "Прогресс не спрашивает разрешения — он просто накапливается.",
+  "Записано. Через месяц скажешь себе спасибо.",
+  "Дисциплина сегодня — результат завтра.",
+  "Ты сделал то, что нужно было сделать. Этого достаточно.",
+  "Каждая тренировка — кирпич в фундамент.",
+  "Не количество тренировок решает, а то, что ты не пропустил эту.",
+  "Мышцы растут не в зале, а в такие моменты — когда фиксируешь и идёшь дальше.",
+  "Маленький подход, большая дистанция. Так и строится результат.",
+];
+let successTimer = null;
+function showSuccess() {
+  const overlay = document.getElementById("successModal");
+  const quote = MOTIVATION_QUOTES[Math.floor(Math.random() * MOTIVATION_QUOTES.length)];
+  document.getElementById("successQuote").textContent = quote;
+  overlay.classList.add("show");
+  clearTimeout(successTimer);
+  successTimer = setTimeout(() => overlay.classList.remove("show"), 2800);
+}
+document.getElementById("successModal").addEventListener("click", () => {
+  document.getElementById("successModal").classList.remove("show");
+  clearTimeout(successTimer);
+});
+
 function finishSession() {
   const filled = Object.values(log).some(sets => sets.some(s => s.weight !== "" || s.reps !== ""));
   if (!filled) return;
@@ -377,6 +434,7 @@ function finishSession() {
   log = emptyLog(PROGRAM[day].exercises);
   renderExercises();
   document.getElementById("histCount").textContent = history.length;
+  showSuccess();
 }
 
 function progressFor(exId) {
