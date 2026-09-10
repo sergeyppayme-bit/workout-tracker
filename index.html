@@ -301,6 +301,10 @@ function muscleLabel(primary, secondary) {
   if (secondary) parts.push(MUSCLE_NAMES[secondary]);
   return parts.join(", ");
 }
+const EX_IMAGE = {
+  a1: "images/a1.jpg", a2: "images/a2.jpg", a3: "images/a3.jpg", a4: "images/a4.jpg",
+  a5: "images/a5.jpg", a6: "images/a6.jpg", a7: "images/a7.jpg", a8: "images/a8.jpg",
+};
 const EX_MUSCLES = {
   a1: { view: "front", primary: "quads", secondary: "glutes" },
   a2: { view: "back", primary: "upperBack", secondary: "biceps" },
@@ -444,7 +448,7 @@ function renderExercises() {
     const last = lastSessionFor(ex.id);
     div.innerHTML = `
       <div class="ex-head">
-        <div class="ex-diagram">${bodyDiagram(m.view, m.primary, m.secondary)}</div>
+        <div class="ex-diagram">${EX_IMAGE[ex.id] ? `<img src="${EX_IMAGE[ex.id]}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />` : bodyDiagram(m.view, m.primary, m.secondary)}</div>
         <div class="ex-head-text">
           <div class="ex-name-row"><strong>${ex.name}</strong><span>${ex.rest}</span></div>
           <div class="ex-meta">${ex.sets}×${ex.reps}${ex.hint ? " · ориентир " + ex.hint : ""}</div>
