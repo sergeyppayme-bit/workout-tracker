@@ -93,9 +93,15 @@
   .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
   .ex-muscle { font-size: 11px; color: var(--text-faint); line-height: 1.4; }
   .ex-muscle b { color: var(--text-dim); font-weight: 600; }
-  .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
-  .grid-row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; margin-bottom: 5px; }
+  .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr 26px; gap: 6px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
+  .grid-row { display: grid; grid-template-columns: 22px 1fr 1fr 26px; gap: 6px; margin-bottom: 5px; align-items: center; }
   .grid-row span { font-size: 12.5px; align-self: center; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .copy-btn {
+    width: 26px; height: 34px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--text-dim); font-size: 13px;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+  }
+  .copy-btn:active { background: var(--dayColor, var(--amber)); color: #1a0f05; }
   .grid-row input {
     padding: 8px; border-radius: 8px; border: 1px solid var(--line);
     background: var(--bg); color: var(--text); font-size: 16px; width: 100%;
@@ -371,14 +377,15 @@ function renderExercises() {
           <div class="ex-muscle">Целевые мышцы: ${muscleLabel(m.primary, m.secondary)}</div>
         </div>
       </div>
-      <div class="grid-head"><span>#</span><span>кг</span><span>повторы</span></div>
+      <div class="grid-head"><span>#</span><span>кг</span><span>повторы</span><span></span></div>
     `;
     log[ex.id].forEach((s, i) => {
       const row = document.createElement("div");
       row.className = "grid-row";
       row.innerHTML = `<span>${i+1}</span>
         <input type="number" inputmode="decimal" data-ex="${ex.id}" data-idx="${i}" data-field="weight" value="${s.weight}" />
-        <input type="number" inputmode="numeric" data-ex="${ex.id}" data-idx="${i}" data-field="reps" value="${s.reps}" />`;
+        <input type="number" inputmode="numeric" data-ex="${ex.id}" data-idx="${i}" data-field="reps" value="${s.reps}" />
+        ${i < ex.sets - 1 ? `<button type="button" class="copy-btn" onclick="copyDown('${ex.id}', ${i})" title="Скопировать в следующий подход">↓</button>` : `<span></span>`}`;
       div.appendChild(row);
     });
     wrap.appendChild(div);
@@ -389,6 +396,22 @@ function renderExercises() {
       log[ex][idx][field] = e.target.value;
     });
   });
+}
+
+function copyDown(exId, idx) {
+  const src = log[exId][idx];
+  const next = log[exId][idx + 1];
+  if (!next || (src.weight === "" && src.reps === "")) return;
+  if (src.weight !== "") {
+    next.weight = src.weight;
+    const el = document.querySelector(`input[data-ex="${exId}"][data-idx="${idx+1}"][data-field="weight"]`);
+    if (el) el.value = src.weight;
+  }
+  if (src.reps !== "") {
+    next.reps = src.reps;
+    const el = document.querySelector(`input[data-ex="${exId}"][data-idx="${idx+1}"][data-field="reps"]`);
+    if (el) el.value = src.reps;
+  }
 }
 
 function renderWorkout() {
