@@ -10,6 +10,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <meta name="apple-mobile-web-app-title" content="Тренировки" />
 <title>Трекер тренировок</title>
+<script>
+  // Принудительный обход кеша: если URL без метки версии, редиректим на версию с текущим таймстемпом
+  if (!location.search.includes("_v=")) {
+    location.replace(location.pathname + "?_v=" + Date.now());
+  }
+</script>
 <style>
   :root {
     color-scheme: dark;
