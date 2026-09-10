@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="apple-mobile-web-app-title" content="Тренировки" />
+<title>Трекер тренировок</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: #0d0d0f; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    color: #f2f2f2;
+    padding: max(10px, env(safe-area-inset-top)) 10px calc(32px + env(safe-area-inset-bottom));
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  h2 { font-size: 20px; margin: 0 0 4px; color: #fff; }
+  h3 { font-size: 15px; margin: 0 0 8px; color: #f2f2f2; }
+  p.sub { font-size: 13px; color: #9a9a9a; margin: 0 0 12px; }
+  .tabs, .days { display: flex; gap: 6px; margin-bottom: 12px; }
+  .tab-btn, .day-btn {
+    flex: 1; padding: 8px 0; border-radius: 8px; border: none;
+    background: #1c1c20; color: #fff; font-weight: 600; font-size: 14px;
+  }
+  .tab-btn.active { background: #3b3b40; }
+  .day-btn { border: 1px solid #2a2a2e; background: #1c1c20; font-size: 13px; }
+  .day-btn.active { border: 2px solid #5b8def; background: #182238; }
+  p.daylabel { font-size: 13px; color: #9a9a9a; margin: -6px 0 14px; }
+  .exercise { margin-bottom: 14px; border: 1px solid #232326; border-radius: 10px; padding: 10px; background: #17171a; }
+  .ex-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .ex-head strong { font-size: 14px; color: #f5f5f5; }
+  .ex-head span { font-size: 11px; color: #8a8a8a; }
+  .ex-meta { font-size: 12px; color: #a3a3a3; margin-bottom: 8px; }
+  .grid-head { display: grid; grid-template-columns: 24px 1fr 1fr; gap: 6px; font-size: 12px; color: #777; margin-bottom: 4px; }
+  .grid-row { display: grid; grid-template-columns: 24px 1fr 1fr; gap: 6px; margin-bottom: 4px; }
+  .grid-row span { font-size: 13px; align-self: center; color: #9a9a9a; }
+  .grid-row input {
+    padding: 8px; border-radius: 6px; border: 1px solid #2e2e33;
+    background: #0d0d0f; color: #f5f5f5; font-size: 16px; width: 100%;
+  }
+  .finish-btn {
+    width: 100%; padding: 12px 0; border-radius: 10px; border: none;
+    background: #16a34a; color: #fff; font-weight: 700; font-size: 15px;
+    margin-top: 4px; margin-bottom: 8px;
+  }
+  .finish-btn:active { opacity: 0.85; }
+  .empty { font-size: 14px; color: #9a9a9a; }
+  .bar-wrap { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .bar { width: 100%; background: #5b8def; border-radius: 3px 3px 0 0; }
+  .progress-item { margin-bottom: 12px; }
+  .progress-item .name { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #e8e8e8; }
+  .progress-item .range { font-size: 10px; color: #8a8a8a; margin-top: 2px; }
+  .session { border: 1px solid #232326; border-radius: 10px; padding: 10px; margin-bottom: 10px; background: #17171a; }
+  .session .top { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .session .top strong { font-size: 13px; color: #f5f5f5; }
+  .session .top span { font-size: 12px; color: #8a8a8a; }
+  .session .line { font-size: 12px; color: #b5b5b5; margin-bottom: 2px; }
+  .footer { font-size: 11px; color: #6a6a6a; text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<h2>Трекер тренировок</h2>
+<p class="sub">A/B/C сплит · без осевой нагрузки на позвоночник</p>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tabWorkout">Тренировка</button>
+  <button class="tab-btn" id="tabHistory">История (<span id="histCount">0</span>)</button>
+</div>
+
+<div id="viewWorkout">
+  <div class="days" id="dayButtons"></div>
+  <p class="daylabel" id="dayLabel"></p>
+  <div id="exerciseList"></div>
+  <button class="finish-btn" id="finishBtn">Завершить и сохранить тренировку</button>
+</div>
+
+<div id="viewHistory" style="display:none;">
+  <div id="emptyMsg" class="empty" style="display:none;">Пока нет сохранённых тренировок. Заполни день и нажми "Завершить".</div>
+  <div id="progressBlock" style="display:none;">
+    <h3>Прогресс по весу (макс. за сессию)</h3>
+    <div id="progressList"></div>
+  </div>
+  <h3 id="sessionsTitle" style="display:none;">Сессии</h3>
+  <div id="sessionsList"></div>
+</div>
+
+<p class="footer">История сохраняется на этом устройстве (localStorage) и не пропадёт при перезакрытии Safari.</p>
+
+<script>
+const PROGRAM = {
+  A: { label: "День A · Вторник", exercises: [
+    { id: "a1", name: "Жим ногами (широкая постановка)", sets: 4, reps: "15-20", rest: "90 сек", hint: "" },
+    { id: "a2", name: "Тяга верхнего блока (широкий хват)", sets: 3, reps: "15-20", rest: "90 сек", hint: "~75 кг" },
+    { id: "a3", name: "Жим гантелей от груди", sets: 3, reps: "15-20", rest: "90 сек", hint: "" },
+    { id: "a4", name: "Сгибание ног лежа", sets: 3, reps: "15-20", rest: "60 сек", hint: "" },
+    { id: "a5", name: "Тяга гантели в наклоне", sets: 3, reps: "15-20", rest: "60 сек", hint: "" },
+    { id: "a6", name: "Разведение гантелей в стороны", sets: 3, reps: "15-20", rest: "45 сек", hint: "" },
+    { id: "a7", name: "Подъем на носки стоя", sets: 4, reps: "20-25", rest: "45 сек", hint: "" },
+    { id: "a8", name: "Сгибания запястий", sets: 3, reps: "20", rest: "30 сек", hint: "" },
+  ]},
+  B: { label: "День B · Четверг", exercises: [
+    { id: "b1", name: "Гакк-присед / жим ногами (узко)", sets: 4, reps: "15-20", rest: "90 сек", hint: "" },
+    { id: "b2", name: "Горизонтальная тяга блока (узко)", sets: 3, reps: "15-20", rest: "90 сек", hint: "" },
+    { id: "b3", name: "Жим в тренажере (грудь)", sets: 3, reps: "15-20", rest: "90 сек", hint: "" },
+    { id: "b4", name: "Разгибание ног в тренажере", sets: 3, reps: "15-20", rest: "60 сек", hint: "" },
+    { id: "b5", name: "Тяга блока к поясу сидя", sets: 3, reps: "15-20", rest: "60 сек", hint: "" },
+    { id: "b6", name: "Жим гантелей сидя (плечи)", sets: 3, reps: "15-20", rest: "45 сек", hint: "~8 кг/гантель" },
+    { id: "b7", name: "Подъем на носки сидя", sets: 4, reps: "20-25", rest: "45 сек", hint: "" },
+    { id: "b8", name: "Обратные сгибания запястий", sets: 3, reps: "15-20", rest: "30 сек", hint: "" },
+  ]},
+  C: { label: "День C · Пятница", exercises: [
+    { id: "c1", name: "Хип-thrust в тренажере", sets: 3, reps: "15-20", rest: "90 сек", hint: "" },
+    { id: "c2", name: "Тяга гантели одной рукой", sets: 3, reps: "15-20", rest: "90 сек", hint: "" },
+    { id: "c3", name: "Сведение в тренажере (pec deck)", sets: 3, reps: "15-20", rest: "60 сек", hint: "~22 кг" },
+    { id: "c4", name: "Сгибание ног сидя", sets: 3, reps: "15-20", rest: "60 сек", hint: "" },
+    { id: "c5", name: "Сгибания на бицепс EZ-штанга", sets: 3, reps: "15-20", rest: "45 сек", hint: "~7 кг" },
+    { id: "c6", name: "Французский жим лёжа", sets: 3, reps: "15-20", rest: "45 сек", hint: "~7 кг/гантель" },
+    { id: "c7", name: "Подъем на носки в тренажере", sets: 4, reps: "20-25", rest: "45 сек", hint: "" },
+    { id: "c8", name: "Вис на турнике", sets: 3, reps: "до отказа", rest: "60 сек", hint: "собств. вес" },
+  ]},
+};
+const DAY_KEYS = Object.keys(PROGRAM);
+const STORAGE_KEY = "workout_tracker_history_v1";
+
+let day = "A";
+let log = {};
+let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let view = "workout";
+
+function emptyLog(exercises) {
+  const l = {};
+  exercises.forEach(ex => { l[ex.id] = Array.from({length: ex.sets}, () => ({weight: "", reps: ""})); });
+  return l;
+}
+log = emptyLog(PROGRAM[day].exercises);
+
+function saveHistory() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+}
+
+function exNameById(id) {
+  for (const d of DAY_KEYS) {
+    const found = PROGRAM[d].exercises.find(e => e.id === id);
+    if (found) return found.name;
+  }
+  return id;
+}
+
+function renderDayButtons() {
+  const wrap = document.getElementById("dayButtons");
+  wrap.innerHTML = "";
+  DAY_KEYS.forEach(d => {
+    const btn = document.createElement("button");
+    btn.className = "day-btn" + (d === day ? " active" : "");
+    btn.textContent = PROGRAM[d].label.split(" · ")[0];
+    btn.onclick = () => { day = d; log = emptyLog(PROGRAM[day].exercises); renderWorkout(); };
+    wrap.appendChild(btn);
+  });
+  document.getElementById("dayLabel").textContent = PROGRAM[day].label;
+}
+
+function renderExercises() {
+  const wrap = document.getElementById("exerciseList");
+  wrap.innerHTML = "";
+  PROGRAM[day].exercises.forEach(ex => {
+    const div = document.createElement("div");
+    div.className = "exercise";
+    div.innerHTML = `
+      <div class="ex-head"><strong>${ex.name}</strong><span>${ex.rest}</span></div>
+      <div class="ex-meta">${ex.sets}×${ex.reps}${ex.hint ? " · ориентир " + ex.hint : ""}</div>
+      <div class="grid-head"><span>#</span><span>кг</span><span>повторы</span></div>
+    `;
+    log[ex.id].forEach((s, i) => {
+      const row = document.createElement("div");
+      row.className = "grid-row";
+      row.innerHTML = `<span>${i+1}</span>
+        <input type="number" inputmode="decimal" data-ex="${ex.id}" data-idx="${i}" data-field="weight" value="${s.weight}" />
+        <input type="number" inputmode="numeric" data-ex="${ex.id}" data-idx="${i}" data-field="reps" value="${s.reps}" />`;
+      div.appendChild(row);
+    });
+    wrap.appendChild(div);
+  });
+  wrap.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("input", (e) => {
+      const { ex, idx, field } = e.target.dataset;
+      log[ex][idx][field] = e.target.value;
+    });
+  });
+}
+
+function renderWorkout() {
+  renderDayButtons();
+  renderExercises();
+}
+
+function finishSession() {
+  const filled = Object.values(log).some(sets => sets.some(s => s.weight !== "" || s.reps !== ""));
+  if (!filled) return;
+  const entry = {
+    id: Date.now(),
+    day,
+    dayLabel: PROGRAM[day].label,
+    date: new Date().toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" }),
+    log: JSON.parse(JSON.stringify(log)),
+  };
+  history.unshift(entry);
+  saveHistory();
+  log = emptyLog(PROGRAM[day].exercises);
+  renderExercises();
+  document.getElementById("histCount").textContent = history.length;
+}
+
+function progressFor(exId) {
+  const points = [];
+  [...history].reverse().forEach(sess => {
+    const sets = sess.log[exId];
+    if (!sets) return;
+    const weights = sets.map(s => parseFloat(s.weight)).filter(w => !isNaN(w));
+    if (weights.length) points.push({ date: sess.date, max: Math.max(...weights) });
+  });
+  return points;
+}
+
+function renderHistory() {
+  document.getElementById("histCount").textContent = history.length;
+  const emptyMsg = document.getElementById("emptyMsg");
+  const progressBlock = document.getElementById("progressBlock");
+  const sessionsTitle = document.getElementById("sessionsTitle");
+  const sessionsList = document.getElementById("sessionsList");
+  const progressList = document.getElementById("progressList");
+
+  emptyMsg.style.display = history.length === 0 ? "block" : "none";
+  sessionsTitle.style.display = history.length ? "block" : "none";
+
+  const allIds = Array.from(new Set(history.flatMap(h => Object.keys(h.log))))
+    .filter(id => progressFor(id).length > 1);
+
+  progressBlock.style.display = allIds.length ? "block" : "none";
+  progressList.innerHTML = "";
+  allIds.forEach(id => {
+    const points = progressFor(id);
+    const max = Math.max(...points.map(p => p.max));
+    const item = document.createElement("div");
+    item.className = "progress-item";
+    const bars = points.map(p => `<div class="bar-col"><div class="bar" style="height:${Math.max(6, (p.max/max)*44)}px" title="${p.date}: ${p.max}кг"></div></div>`).join("");
+    item.innerHTML = `
+      <div class="name">${exNameById(id)}</div>
+      <div class="bar-wrap">${bars}</div>
+      <div class="range">${points[0].date} → ${points[points.length-1].date} · ${points[0].max}кг → ${points[points.length-1].max}кг</div>
+    `;
+    progressList.appendChild(item);
+  });
+
+  sessionsList.innerHTML = "";
+  history.forEach(sess => {
+    const div = document.createElement("div");
+    div.className = "session";
+    let lines = "";
+    Object.entries(sess.log).forEach(([exId, sets]) => {
+      const filled = sets.filter(s => s.weight !== "" || s.reps !== "");
+      if (!filled.length) return;
+      lines += `<div class="line">${exNameById(exId)}: ${filled.map(s => `${s.weight||"-"}×${s.reps||"-"}`).join(", ")}</div>`;
+    });
+    div.innerHTML = `<div class="top"><strong>${sess.dayLabel}</strong><span>${sess.date}</span></div>${lines}`;
+    sessionsList.appendChild(div);
+  });
+}
+
+document.getElementById("tabWorkout").onclick = () => {
+  view = "workout";
+  document.getElementById("tabWorkout").classList.add("active");
+  document.getElementById("tabHistory").classList.remove("active");
+  document.getElementById("viewWorkout").style.display = "block";
+  document.getElementById("viewHistory").style.display = "none";
+};
+document.getElementById("tabHistory").onclick = () => {
+  view = "history";
+  document.getElementById("tabHistory").classList.add("active");
+  document.getElementById("tabWorkout").classList.remove("active");
+  document.getElementById("viewWorkout").style.display = "none";
+  document.getElementById("viewHistory").style.display = "block";
+  renderHistory();
+};
+document.getElementById("finishBtn").onclick = finishSession;
+
+renderWorkout();
+document.getElementById("histCount").textContent = history.length;
+</script>
+</body>
+</html>
