@@ -11,8 +11,11 @@
 <meta name="apple-mobile-web-app-title" content="Тренировки" />
 <title>Трекер тренировок</title>
 <script>
-  // Принудительный обход кеша: если URL без метки версии, редиректим на версию с текущим таймстемпом
-  if (!location.search.includes("_v=")) {
+  // Принудительный обход кеша: один раз за сессию запуска приложения
+  // (не за URL — sessionStorage сбрасывается при каждом холодном старте PWA),
+  // поэтому даже если в закладке уже "застряла" старая версия ?_v=..., это её перебьёт.
+  if (!sessionStorage.getItem("_cachebust")) {
+    sessionStorage.setItem("_cachebust", "1");
     location.replace(location.pathname + "?_v=" + Date.now());
   }
 </script>
