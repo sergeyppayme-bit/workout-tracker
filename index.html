@@ -95,8 +95,12 @@
   .ex-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
   .ex-diagram {
     flex-shrink: 0; width: 92px; height: 124px; border-radius: 10px;
-    background: var(--surface-2); display: flex; align-items: center; justify-content: center; padding: 4px;
-    border: 1px solid var(--line);
+    background-color: var(--surface-2);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(23,230,230,0.07) 0, rgba(23,230,230,0.07) 1px, transparent 1px, transparent 12px),
+      repeating-linear-gradient(90deg, rgba(23,230,230,0.07) 0, rgba(23,230,230,0.07) 1px, transparent 1px, transparent 12px);
+    display: flex; align-items: center; justify-content: center; padding: 4px;
+    border: 1px solid var(--line); overflow: hidden;
   }
   .ex-diagram svg { width: 100%; height: 100%; display: block; }
   .ex-head-text { flex: 1; min-width: 0; padding-top: 1px; }
@@ -225,22 +229,22 @@ const DAY_COLORS = { A: "#ff2e88", B: "#17e6e6", C: "#baff29" };
 /* Схема тела с подсветкой рабочих мышечных групп (силуэт сбоку, лицом вправо:
    зоны ближе к "переду" — грудь/пресс/бицепс/квадрицепс, зоны ближе к "спине" — 
    спина/трицепс/бицепс бедра/икры/ягодицы). Не фото — собственная отрисовка. */
-const SKELETON = `<circle cx="110" cy="38" r="14" fill="#2a1a48"/><path d="M85,58 L135,58 L142,95 L128,140 L138,150 L82,150 L92,140 L78,95 Z" fill="#1a1030" stroke="#33205a" stroke-width="1"/><path d="M87,64 L62,100 L55,150" fill="none" stroke="#33205a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="M133,64 L158,100 L165,150" fill="none" stroke="#33205a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="M97,150 L92,215 L88,280" fill="none" stroke="#33205a" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M123,150 L128,215 L132,280" fill="none" stroke="#33205a" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>`;
+const SKELETON = `<circle cx="110" cy="147" r="125" fill="none" stroke="#17e6e6" stroke-width="1" stroke-opacity="0.22"/><rect x="30" y="20" width="160" height="255" fill="none" stroke="#17e6e6" stroke-width="1" stroke-opacity="0.28"/><circle cx="110" cy="30" r="13" fill="#140c28" stroke="#17e6e6" stroke-width="1.2" style="filter:drop-shadow(0 0 4px rgba(23,230,230,0.7))"/><line x1="102" y1="27" x2="118" y2="27" stroke="#17e6e6" stroke-width="0.8" stroke-opacity="0.6"/><path d="M92,48 L128,48 L134,82 L124,132 L132,142 L88,142 L96,132 L86,82 Z" fill="#140c28" stroke="#17e6e6" stroke-width="1.2" style="filter:drop-shadow(0 0 5px rgba(23,230,230,0.6))"/><line x1="110" y1="50" x2="110" y2="140" stroke="#17e6e6" stroke-width="1" stroke-opacity="0.55"/><line x1="94" y1="50" x2="126" y2="50" stroke="#17e6e6" stroke-width="0.8" stroke-opacity="0.5"/><path d="M90,58 L62,56 L35,54" fill="none" stroke="#1c1136" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/><path d="M90,58 L62,56 L35,54" fill="none" stroke="#17e6e6" stroke-width="1" stroke-linecap="round" stroke-opacity="0.55" style="filter:drop-shadow(0 0 3px rgba(23,230,230,0.6))"/><circle cx="62" cy="56" r="3.5" fill="none" stroke="#17e6e6" stroke-width="1.2" style="filter:drop-shadow(0 0 4px rgba(23,230,230,0.8))"/><path d="M130,58 L158,56 L185,54" fill="none" stroke="#1c1136" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/><path d="M130,58 L158,56 L185,54" fill="none" stroke="#17e6e6" stroke-width="1" stroke-linecap="round" stroke-opacity="0.55" style="filter:drop-shadow(0 0 3px rgba(23,230,230,0.6))"/><circle cx="158" cy="56" r="3.5" fill="none" stroke="#17e6e6" stroke-width="1.2" style="filter:drop-shadow(0 0 4px rgba(23,230,230,0.8))"/><path d="M100,142 L85,205 L75,270" fill="none" stroke="#1c1136" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><path d="M100,142 L85,205 L75,270" fill="none" stroke="#17e6e6" stroke-width="1" stroke-linecap="round" stroke-opacity="0.55" style="filter:drop-shadow(0 0 3px rgba(23,230,230,0.6))"/><circle cx="85" cy="205" r="3.5" fill="none" stroke="#17e6e6" stroke-width="1.2" style="filter:drop-shadow(0 0 4px rgba(23,230,230,0.8))"/><path d="M120,142 L135,205 L145,270" fill="none" stroke="#1c1136" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><path d="M120,142 L135,205 L145,270" fill="none" stroke="#17e6e6" stroke-width="1" stroke-linecap="round" stroke-opacity="0.55" style="filter:drop-shadow(0 0 3px rgba(23,230,230,0.6))"/><circle cx="135" cy="205" r="3.5" fill="none" stroke="#17e6e6" stroke-width="1.2" style="filter:drop-shadow(0 0 4px rgba(23,230,230,0.8))"/>`;
 const FRONT_ZONES = {
-  shoulders: [{c:"circle",cx:87,cy:68,r:9},{c:"circle",cx:133,cy:68,r:9}],
-  chest: [{c:"ellipse",cx:97,cy:85,rx:13,ry:11},{c:"ellipse",cx:123,cy:85,rx:13,ry:11}],
-  biceps: [{c:"ellipse",cx:68,cy:88,rx:7,ry:10},{c:"ellipse",cx:152,cy:88,rx:7,ry:10}],
-  forearm: [{c:"ellipse",cx:58,cy:125,rx:6,ry:14},{c:"ellipse",cx:162,cy:125,rx:6,ry:14}],
-  quads: [{c:"ellipse",cx:95,cy:200,rx:8,ry:16},{c:"ellipse",cx:125,cy:200,rx:8,ry:16}],
+  shoulders: [{x:83,y:51,w:14,h:14},{x:123,y:51,w:14,h:14}],
+  chest: [{x:93,y:58,w:15,h:20},{x:112,y:58,w:15,h:20}],
+  biceps: [{x:64,y:50,w:24,h:14},{x:132,y:50,w:24,h:14}],
+  forearm: [{x:36,y:48,w:24,h:14},{x:160,y:48,w:24,h:14}],
+  quads: [{x:80,y:155,w:22,h:36},{x:118,y:155,w:22,h:36}],
 };
 const BACK_ZONES = {
-  shoulders: [{c:"circle",cx:87,cy:68,r:9},{c:"circle",cx:133,cy:68,r:9}],
-  upperBack: [{c:"ellipse",cx:110,cy:80,rx:18,ry:15}],
-  triceps: [{c:"ellipse",cx:62,cy:90,rx:7,ry:11},{c:"ellipse",cx:158,cy:90,rx:7,ry:11}],
-  forearm: [{c:"ellipse",cx:58,cy:127,rx:6,ry:14},{c:"ellipse",cx:162,cy:127,rx:6,ry:14}],
-  glutes: [{c:"ellipse",cx:110,cy:148,rx:16,ry:10}],
-  hamstrings: [{c:"ellipse",cx:97,cy:202,rx:8,ry:16},{c:"ellipse",cx:123,cy:202,rx:8,ry:16}],
-  calves: [{c:"ellipse",cx:90,cy:257,rx:7,ry:15},{c:"ellipse",cx:130,cy:257,rx:7,ry:15}],
+  shoulders: [{x:83,y:51,w:14,h:14},{x:123,y:51,w:14,h:14}],
+  upperBack: [{x:94,y:58,w:32,h:24}],
+  triceps: [{x:64,y:50,w:24,h:14},{x:132,y:50,w:24,h:14}],
+  forearm: [{x:36,y:48,w:24,h:14},{x:160,y:48,w:24,h:14}],
+  glutes: [{x:90,y:132,w:40,h:18}],
+  hamstrings: [{x:80,y:155,w:22,h:36},{x:118,y:155,w:22,h:36}],
+  calves: [{x:68,y:218,w:20,h:40},{x:132,y:218,w:20,h:40}],
 };
 const MUSCLE_COLORS = {
   chest: "#ff3864", shoulders: "#b967ff", biceps: "#ff5eee", forearm: "#17e6e6",
@@ -253,10 +257,9 @@ const MUSCLE_NAMES = {
   quads: "квадрицепс", hamstrings: "бицепс бедра", calves: "икры",
 };
 function renderZone(shapes, color, opacity) {
-  return shapes.map(s => {
-    if (s.c === "circle") return `<circle cx="${s.cx}" cy="${s.cy}" r="${s.r}" fill="${color}" fill-opacity="${opacity}"/>`;
-    return `<ellipse cx="${s.cx}" cy="${s.cy}" rx="${s.rx}" ry="${s.ry}" fill="${color}" fill-opacity="${opacity}"/>`;
-  }).join("");
+  return shapes.map(s =>
+    `<rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="3" fill="${color}" fill-opacity="${opacity}" stroke="${color}" stroke-width="1" style="filter:drop-shadow(0 0 6px ${color})"/>`
+  ).join("");
 }
 function bodyDiagram(view, primary, secondary) {
   const zones = view === "back" ? BACK_ZONES : FRONT_ZONES;
