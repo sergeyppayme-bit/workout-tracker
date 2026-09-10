@@ -110,14 +110,16 @@
   .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
   .ex-muscle { font-size: 11px; color: var(--text-faint); line-height: 1.4; }
   .ex-muscle b { color: var(--text-dim); font-weight: 600; }
-  .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr 26px; gap: 6px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
-  .grid-row { display: grid; grid-template-columns: 22px 1fr 1fr 26px; gap: 6px; margin-bottom: 5px; align-items: center; }
+  .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr 44px; gap: 6px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
+  .grid-row { display: grid; grid-template-columns: 22px 1fr 1fr 44px; gap: 6px; margin-bottom: 5px; align-items: center; }
   .grid-row span { font-size: 12.5px; align-self: center; color: var(--text-dim); font-variant-numeric: tabular-nums; }
   .copy-btn {
-    width: 26px; height: 34px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--surface-2); color: var(--text-dim); font-size: 13px;
-    display: flex; align-items: center; justify-content: center; padding: 0;
+    width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--text-dim); font-size: 10px; font-weight: 600;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; gap: 1px; line-height: 1;
   }
+  .copy-btn .arrow { font-size: 13px; }
+  .copy-hint { font-size: 11px; color: var(--text-faint); margin: -2px 0 12px; }
   .copy-btn:active { background: var(--dayColor, var(--amber)); color: #1a0f05; box-shadow: 0 0 12px var(--dayColor, var(--amber)); }
   .grid-row input {
     padding: 8px; border-radius: 8px; border: 1px solid var(--line);
@@ -136,6 +138,10 @@
     transition: transform .12s, box-shadow .12s;
   }
   .finish-btn:active { transform: scale(0.98); box-shadow: 0 0 14px rgba(255,46,136,0.5); }
+  .finish-btn:disabled { opacity: 0.35; box-shadow: none; filter: grayscale(0.6); }
+
+  .ex-last { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+  .ex-last b { color: var(--text); font-weight: 700; }
 
   .empty, .progress-empty { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; padding: 4px 2px; }
 
@@ -178,6 +184,13 @@
   }
   .modal-title { font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 8px; text-shadow: 0 0 10px rgba(23,230,230,0.5); }
   .modal-quote { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; font-style: italic; }
+
+  .export-btn {
+    width: 100%; padding: 11px 0; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--text); font-weight: 700; font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .export-btn:active { background: var(--line); }
 </style>
 </head>
 <body>
@@ -196,8 +209,9 @@
 <div id="viewWorkout">
   <div class="days" id="dayButtons"></div>
   <p class="daylabel" id="dayLabel"></p>
+  <p class="copy-hint">↓ рядом с подходом — скопировать вес и повторы в следующий подход</p>
   <div id="exerciseList"></div>
-  <button class="finish-btn" id="finishBtn">Завершить и сохранить тренировку</button>
+  <button class="finish-btn" id="finishBtn" disabled>Завершить и сохранить тренировку</button>
 </div>
 
 <div id="viewProgress" style="display:none;">
@@ -207,6 +221,7 @@
 
 <div id="viewHistory" style="display:none;">
   <div id="emptyMsg" class="empty" style="display:none;">Пока нет сохранённых тренировок. Заполни день и нажми «Завершить».</div>
+  <button class="export-btn" id="exportBtn" style="display:none;">⬇ Экспортировать историю в файл</button>
   <h3 id="sessionsTitle" style="display:none;">Сессии</h3>
   <div id="sessionsList"></div>
 </div>
@@ -360,6 +375,13 @@ function exNameById(id) {
   return id;
 }
 
+function hasUnsavedData() {
+  return Object.values(log).some(sets => sets.some(s => s.weight !== "" || s.reps !== ""));
+}
+function updateFinishBtn() {
+  document.getElementById("finishBtn").disabled = !hasUnsavedData();
+}
+
 function renderDayButtons() {
   const wrap = document.getElementById("dayButtons");
   wrap.innerHTML = "";
@@ -373,10 +395,29 @@ function renderDayButtons() {
     btn.style.color = d === day ? "#fff" : "";
     btn.style.boxShadow = d === day ? `0 0 14px ${c}88, inset 0 0 8px ${c}33` : "";
     btn.textContent = PROGRAM[d].label.split(" · ")[0];
-    btn.onclick = () => { day = d; log = emptyLog(PROGRAM[day].exercises); renderWorkout(); };
+    btn.onclick = () => {
+      if (d === day) return;
+      if (hasUnsavedData() && !confirm("В текущей тренировке есть незавершённые данные. Переключить день и потерять их?")) return;
+      day = d;
+      log = emptyLog(PROGRAM[day].exercises);
+      renderWorkout();
+    };
     wrap.appendChild(btn);
   });
   document.getElementById("dayLabel").textContent = PROGRAM[day].label;
+}
+
+function lastSessionFor(exId) {
+  for (const sess of history) {
+    const sets = sess.log[exId];
+    if (!sets) continue;
+    const filled = sets.filter(s => s.weight !== "" || s.reps !== "");
+    if (!filled.length) continue;
+    let best = filled[0];
+    filled.forEach(s => { if ((parseFloat(s.weight) || 0) > (parseFloat(best.weight) || 0)) best = s; });
+    return { date: sess.date, weight: best.weight, reps: best.reps };
+  }
+  return null;
 }
 
 function renderExercises() {
@@ -388,12 +429,14 @@ function renderExercises() {
     div.className = "exercise";
     div.style.setProperty("--dayColor", dayColor);
     const m = EX_MUSCLES[ex.id] || {};
+    const last = lastSessionFor(ex.id);
     div.innerHTML = `
       <div class="ex-head">
         <div class="ex-diagram">${bodyDiagram(m.view, m.primary, m.secondary)}</div>
         <div class="ex-head-text">
           <div class="ex-name-row"><strong>${ex.name}</strong><span>${ex.rest}</span></div>
           <div class="ex-meta">${ex.sets}×${ex.reps}${ex.hint ? " · ориентир " + ex.hint : ""}</div>
+          ${last ? `<div class="ex-last">Прошлый раз: <b>${last.weight || "-"}кг</b> × ${last.reps || "-"} (${last.date})</div>` : ""}
           <div class="ex-muscle">Целевые мышцы: ${muscleLabel(m.primary, m.secondary)}</div>
         </div>
       </div>
@@ -405,7 +448,7 @@ function renderExercises() {
       row.innerHTML = `<span>${i+1}</span>
         <input type="number" inputmode="decimal" data-ex="${ex.id}" data-idx="${i}" data-field="weight" value="${s.weight}" />
         <input type="number" inputmode="numeric" data-ex="${ex.id}" data-idx="${i}" data-field="reps" value="${s.reps}" />
-        ${i < ex.sets - 1 ? `<button type="button" class="copy-btn" onclick="copyDown('${ex.id}', ${i})" title="Скопировать в следующий подход">↓</button>` : `<span></span>`}`;
+        ${i < ex.sets - 1 ? `<button type="button" class="copy-btn" onclick="copyDown('${ex.id}', ${i})"><span class="arrow">↓</span><span>тот же</span></button>` : `<span></span>`}`;
       div.appendChild(row);
     });
     wrap.appendChild(div);
@@ -414,8 +457,10 @@ function renderExercises() {
     inp.addEventListener("input", (e) => {
       const { ex, idx, field } = e.target.dataset;
       log[ex][idx][field] = e.target.value;
+      updateFinishBtn();
     });
   });
+  updateFinishBtn();
 }
 
 function copyDown(exId, idx) {
@@ -432,6 +477,7 @@ function copyDown(exId, idx) {
     const el = document.querySelector(`input[data-ex="${exId}"][data-idx="${idx+1}"][data-field="reps"]`);
     if (el) el.value = src.reps;
   }
+  updateFinishBtn();
 }
 
 function renderWorkout() {
@@ -482,6 +528,19 @@ function finishSession() {
   document.getElementById("histCount").textContent = history.length;
   showSuccess();
 }
+
+function exportHistory() {
+  const blob = new Blob([JSON.stringify(history, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `workout-history-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+document.getElementById("exportBtn").onclick = exportHistory;
 
 function progressFor(exId) {
   const points = [];
@@ -556,9 +615,11 @@ function renderHistory() {
   const emptyMsg = document.getElementById("emptyMsg");
   const sessionsTitle = document.getElementById("sessionsTitle");
   const sessionsList = document.getElementById("sessionsList");
+  const exportBtn = document.getElementById("exportBtn");
 
   emptyMsg.style.display = history.length === 0 ? "block" : "none";
   sessionsTitle.style.display = history.length ? "block" : "none";
+  exportBtn.style.display = history.length ? "block" : "none";
 
   sessionsList.innerHTML = "";
   history.forEach(sess => {
