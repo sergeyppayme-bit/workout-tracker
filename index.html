@@ -23,8 +23,8 @@
   p.sub { font-size: 13px; color: #9a9a9a; margin: 0 0 12px; }
   .tabs, .days { display: flex; gap: 6px; margin-bottom: 12px; }
   .tab-btn, .day-btn {
-    flex: 1; padding: 8px 0; border-radius: 8px; border: none;
-    background: #1c1c20; color: #fff; font-weight: 600; font-size: 14px;
+    flex: 1; padding: 8px 2px; border-radius: 8px; border: none;
+    background: #1c1c20; color: #fff; font-weight: 600; font-size: 13px;
   }
   .tab-btn.active { background: #3b3b40; }
   .day-btn { border: 1px solid #2a2a2e; background: #1c1c20; font-size: 13px; }
@@ -52,9 +52,13 @@
   .bar-wrap { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
   .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
   .bar { width: 100%; background: #5b8def; border-radius: 3px 3px 0 0; }
-  .progress-item { margin-bottom: 12px; }
-  .progress-item .name { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #e8e8e8; }
-  .progress-item .range { font-size: 10px; color: #8a8a8a; margin-top: 2px; }
+  .progress-item { margin-bottom: 18px; border: 1px solid #232326; border-radius: 10px; padding: 10px; background: #17171a; }
+  .progress-item .name { font-size: 13px; font-weight: 600; margin-bottom: 2px; color: #e8e8e8; }
+  .progress-item .stat { font-size: 11px; color: #8a8a8a; margin-bottom: 6px; }
+  .progress-item .stat b { color: #5b8def; font-weight: 700; }
+  .progress-item .range { font-size: 10px; color: #8a8a8a; margin-top: 4px; }
+  .progress-chart { width: 100%; height: 70px; display: block; }
+  .progress-empty { font-size: 13px; color: #9a9a9a; }
   .session { border: 1px solid #232326; border-radius: 10px; padding: 10px; margin-bottom: 10px; background: #17171a; }
   .session .top { display: flex; justify-content: space-between; margin-bottom: 6px; }
   .session .top strong { font-size: 13px; color: #f5f5f5; }
@@ -70,6 +74,7 @@
 
 <div class="tabs">
   <button class="tab-btn active" id="tabWorkout">Тренировка</button>
+  <button class="tab-btn" id="tabProgress">Прогресс</button>
   <button class="tab-btn" id="tabHistory">История (<span id="histCount">0</span>)</button>
 </div>
 
@@ -80,12 +85,13 @@
   <button class="finish-btn" id="finishBtn">Завершить и сохранить тренировку</button>
 </div>
 
+<div id="viewProgress" style="display:none;">
+  <div id="progressEmpty" class="progress-empty" style="display:none;">Пока нет данных для графиков — заполни вес хотя бы в одной тренировке и нажми "Завершить".</div>
+  <div id="progressList"></div>
+</div>
+
 <div id="viewHistory" style="display:none;">
   <div id="emptyMsg" class="empty" style="display:none;">Пока нет сохранённых тренировок. Заполни день и нажми "Завершить".</div>
-  <div id="progressBlock" style="display:none;">
-    <h3>Прогресс по весу (макс. за сессию)</h3>
-    <div id="progressList"></div>
-  </div>
   <h3 id="sessionsTitle" style="display:none;">Сессии</h3>
   <div id="sessionsList"></div>
 </div>
@@ -227,35 +233,63 @@ function progressFor(exId) {
   return points;
 }
 
-function renderHistory() {
-  document.getElementById("histCount").textContent = history.length;
-  const emptyMsg = document.getElementById("emptyMsg");
-  const progressBlock = document.getElementById("progressBlock");
-  const sessionsTitle = document.getElementById("sessionsTitle");
-  const sessionsList = document.getElementById("sessionsList");
+function lineChartSVG(points) {
+  const W = 300, H = 70, padX = 8, padY = 10;
+  const vals = points.map(p => p.max);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const span = max - min || 1;
+  const step = points.length > 1 ? (W - padX * 2) / (points.length - 1) : 0;
+  const coords = points.map((p, i) => {
+    const x = points.length > 1 ? padX + i * step : W / 2;
+    const y = H - padY - ((p.max - min) / span) * (H - padY * 2);
+    return { x, y, p };
+  });
+  const path = coords.map((c, i) => (i === 0 ? "M" : "L") + c.x.toFixed(1) + "," + c.y.toFixed(1)).join(" ");
+  const dots = coords.map(c =>
+    `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="#5b8def"><title>${c.p.date}: ${c.p.max}кг</title></circle>` +
+    `<text x="${c.x.toFixed(1)}" y="${(c.y - 8).toFixed(1)}" font-size="9" fill="#c8c8c8" text-anchor="middle">${c.p.max}</text>`
+  ).join("");
+  return `<svg class="progress-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <path d="${path}" fill="none" stroke="#5b8def" stroke-width="2" vector-effect="non-scaling-stroke"/>
+    ${dots}
+  </svg>`;
+}
+
+function renderProgress() {
+  const progressEmpty = document.getElementById("progressEmpty");
   const progressList = document.getElementById("progressList");
 
-  emptyMsg.style.display = history.length === 0 ? "block" : "none";
-  sessionsTitle.style.display = history.length ? "block" : "none";
-
   const allIds = Array.from(new Set(history.flatMap(h => Object.keys(h.log))))
-    .filter(id => progressFor(id).length > 1);
+    .filter(id => progressFor(id).length >= 1);
 
-  progressBlock.style.display = allIds.length ? "block" : "none";
+  progressEmpty.style.display = allIds.length ? "none" : "block";
   progressList.innerHTML = "";
   allIds.forEach(id => {
     const points = progressFor(id);
-    const max = Math.max(...points.map(p => p.max));
+    const first = points[0].max, last = points[points.length - 1].max;
+    const diff = last - first;
+    const diffLabel = points.length > 1
+      ? `<b>${diff > 0 ? "+" : ""}${diff}кг</b> с начала (${points[0].date} → ${points[points.length-1].date})`
+      : `первая запись: <b>${first}кг</b>`;
     const item = document.createElement("div");
     item.className = "progress-item";
-    const bars = points.map(p => `<div class="bar-col"><div class="bar" style="height:${Math.max(6, (p.max/max)*44)}px" title="${p.date}: ${p.max}кг"></div></div>`).join("");
     item.innerHTML = `
       <div class="name">${exNameById(id)}</div>
-      <div class="bar-wrap">${bars}</div>
-      <div class="range">${points[0].date} → ${points[points.length-1].date} · ${points[0].max}кг → ${points[points.length-1].max}кг</div>
+      <div class="stat">${diffLabel}</div>
+      ${points.length > 1 ? lineChartSVG(points) : `<div class="range">Появится график после второй тренировки с этим упражнением</div>`}
     `;
     progressList.appendChild(item);
   });
+}
+
+function renderHistory() {
+  document.getElementById("histCount").textContent = history.length;
+  const emptyMsg = document.getElementById("emptyMsg");
+  const sessionsTitle = document.getElementById("sessionsTitle");
+  const sessionsList = document.getElementById("sessionsList");
+
+  emptyMsg.style.display = history.length === 0 ? "block" : "none";
+  sessionsTitle.style.display = history.length ? "block" : "none";
 
   sessionsList.innerHTML = "";
   history.forEach(sess => {
@@ -272,21 +306,23 @@ function renderHistory() {
   });
 }
 
-document.getElementById("tabWorkout").onclick = () => {
-  view = "workout";
-  document.getElementById("tabWorkout").classList.add("active");
-  document.getElementById("tabHistory").classList.remove("active");
-  document.getElementById("viewWorkout").style.display = "block";
-  document.getElementById("viewHistory").style.display = "none";
+const tabs = {
+  workout: { btn: "tabWorkout", view: "viewWorkout" },
+  progress: { btn: "tabProgress", view: "viewProgress" },
+  history: { btn: "tabHistory", view: "viewHistory" },
 };
-document.getElementById("tabHistory").onclick = () => {
-  view = "history";
-  document.getElementById("tabHistory").classList.add("active");
-  document.getElementById("tabWorkout").classList.remove("active");
-  document.getElementById("viewWorkout").style.display = "none";
-  document.getElementById("viewHistory").style.display = "block";
-  renderHistory();
-};
+function switchTab(name) {
+  view = name;
+  Object.entries(tabs).forEach(([k, v]) => {
+    document.getElementById(v.btn).classList.toggle("active", k === name);
+    document.getElementById(v.view).style.display = k === name ? "block" : "none";
+  });
+  if (name === "progress") renderProgress();
+  if (name === "history") renderHistory();
+}
+document.getElementById("tabWorkout").onclick = () => switchTab("workout");
+document.getElementById("tabProgress").onclick = () => switchTab("progress");
+document.getElementById("tabHistory").onclick = () => switchTab("history");
 document.getElementById("finishBtn").onclick = finishSession;
 
 renderWorkout();
