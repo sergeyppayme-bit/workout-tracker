@@ -8,69 +8,116 @@
 <meta name="apple-mobile-web-app-title" content="Тренировки" />
 <title>Трекер тренировок</title>
 <style>
-  :root { color-scheme: dark; }
+  :root {
+    color-scheme: dark;
+    --bg: #0a0a0c;
+    --surface: #16161a;
+    --surface-2: #1c1c21;
+    --line: #232329;
+    --text: #f3f3f0;
+    --text-dim: #8c8c94;
+    --text-faint: #5c5c64;
+    --amber: #e8863a;
+    --blue: #4f8ff0;
+    --green: #39b787;
+    --radius: 14px;
+  }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; background: #0d0d0f; }
+  html, body { margin: 0; padding: 0; background: var(--bg); }
   body {
     font-family: -apple-system, system-ui, sans-serif;
-    color: #f2f2f2;
-    padding: max(10px, env(safe-area-inset-top)) 10px calc(32px + env(safe-area-inset-bottom));
+    color: var(--text);
+    padding: max(14px, env(safe-area-inset-top)) 14px calc(36px + env(safe-area-inset-bottom));
     max-width: 480px;
     margin: 0 auto;
+    -webkit-font-smoothing: antialiased;
   }
-  h2 { font-size: 20px; margin: 0 0 4px; color: #fff; }
-  h3 { font-size: 15px; margin: 0 0 8px; color: #f2f2f2; }
-  p.sub { font-size: 13px; color: #9a9a9a; margin: 0 0 12px; }
-  .tabs, .days { display: flex; gap: 6px; margin-bottom: 12px; }
-  .tab-btn, .day-btn {
-    flex: 1; padding: 8px 2px; border-radius: 8px; border: none;
-    background: #1c1c20; color: #fff; font-weight: 600; font-size: 13px;
+
+  header { position: relative; padding-top: 6px; margin-bottom: 18px; }
+  header::before {
+    content: ""; position: absolute; top: -30px; left: -20px; width: 200px; height: 140px;
+    background: radial-gradient(closest-side, rgba(232,134,58,0.16), transparent 70%);
+    pointer-events: none;
   }
-  .tab-btn.active { background: #3b3b40; }
-  .day-btn { border: 1px solid #2a2a2e; background: #1c1c20; font-size: 13px; }
-  .day-btn.active { border: 2px solid #5b8def; background: #182238; }
-  p.daylabel { font-size: 13px; color: #9a9a9a; margin: -6px 0 14px; }
-  .exercise { margin-bottom: 14px; border: 1px solid #232326; border-radius: 10px; padding: 10px; background: #17171a; }
-  .ex-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-  .ex-head strong { font-size: 14px; color: #f5f5f5; }
-  .ex-head span { font-size: 11px; color: #8a8a8a; }
-  .ex-meta { font-size: 12px; color: #a3a3a3; margin-bottom: 8px; }
-  .grid-head { display: grid; grid-template-columns: 24px 1fr 1fr; gap: 6px; font-size: 12px; color: #777; margin-bottom: 4px; }
-  .grid-row { display: grid; grid-template-columns: 24px 1fr 1fr; gap: 6px; margin-bottom: 4px; }
-  .grid-row span { font-size: 13px; align-self: center; color: #9a9a9a; }
+  h2 { position: relative; font-size: 21px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 3px; color: #fff; }
+  p.sub { position: relative; font-size: 13px; color: var(--text-dim); margin: 0; }
+
+  /* segmented tabs */
+  .tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+    background: var(--surface); padding: 4px; border-radius: 12px; margin-bottom: 16px;
+  }
+  .tab-btn {
+    padding: 9px 2px; border-radius: 9px; border: none; background: transparent;
+    color: var(--text-dim); font-weight: 600; font-size: 12.5px; transition: background .18s, color .18s;
+  }
+  .tab-btn.active { background: var(--surface-2); color: #fff; }
+
+  /* day selector */
+  .days { display: flex; gap: 6px; margin-bottom: 4px; }
+  .day-btn {
+    flex: 1; padding: 9px 2px; border-radius: 10px; font-weight: 700; font-size: 13px;
+    background: var(--surface); color: var(--text-dim); border: 1px solid var(--line);
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .day-btn.active { color: #fff; }
+
+  p.daylabel { font-size: 12.5px; color: var(--text-dim); margin: 10px 0 14px; }
+
+  .exercise {
+    margin-bottom: 12px; border-radius: var(--radius); padding: 12px 12px 10px 14px;
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--dayColor, var(--amber));
+  }
+  .ex-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+  .ex-head strong { font-size: 14px; font-weight: 650; color: var(--text); line-height: 1.25; }
+  .ex-head span { flex-shrink: 0; font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+  .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 10px; }
+  .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
+  .grid-row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; margin-bottom: 5px; }
+  .grid-row span { font-size: 12.5px; align-self: center; color: var(--text-dim); font-variant-numeric: tabular-nums; }
   .grid-row input {
-    padding: 8px; border-radius: 6px; border: 1px solid #2e2e33;
-    background: #0d0d0f; color: #f5f5f5; font-size: 16px; width: 100%;
+    padding: 8px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); font-size: 16px; width: 100%;
+    font-variant-numeric: tabular-nums; font-family: ui-monospace, "SF Mono", monospace;
+    transition: border-color .15s;
   }
+  .grid-row input:focus { outline: none; border-color: var(--dayColor, var(--amber)); }
+
   .finish-btn {
-    width: 100%; padding: 12px 0; border-radius: 10px; border: none;
-    background: #16a34a; color: #fff; font-weight: 700; font-size: 15px;
-    margin-top: 4px; margin-bottom: 8px;
+    width: 100%; padding: 14px 0; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #ef9a54, #d9722a); color: #1a0f05; font-weight: 800; font-size: 15px;
+    margin-top: 6px; margin-bottom: 10px; box-shadow: 0 6px 20px -6px rgba(232,134,58,0.55);
+    transition: transform .12s, box-shadow .12s;
   }
-  .finish-btn:active { opacity: 0.85; }
-  .empty { font-size: 14px; color: #9a9a9a; }
-  .bar-wrap { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
-  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
-  .bar { width: 100%; background: #5b8def; border-radius: 3px 3px 0 0; }
-  .progress-item { margin-bottom: 18px; border: 1px solid #232326; border-radius: 10px; padding: 10px; background: #17171a; }
-  .progress-item .name { font-size: 13px; font-weight: 600; margin-bottom: 2px; color: #e8e8e8; }
-  .progress-item .stat { font-size: 11px; color: #8a8a8a; margin-bottom: 6px; }
-  .progress-item .stat b { color: #5b8def; font-weight: 700; }
-  .progress-item .range { font-size: 10px; color: #8a8a8a; margin-top: 4px; }
-  .progress-chart { width: 100%; height: 70px; display: block; }
-  .progress-empty { font-size: 13px; color: #9a9a9a; }
-  .session { border: 1px solid #232326; border-radius: 10px; padding: 10px; margin-bottom: 10px; background: #17171a; }
-  .session .top { display: flex; justify-content: space-between; margin-bottom: 6px; }
-  .session .top strong { font-size: 13px; color: #f5f5f5; }
-  .session .top span { font-size: 12px; color: #8a8a8a; }
-  .session .line { font-size: 12px; color: #b5b5b5; margin-bottom: 2px; }
-  .footer { font-size: 11px; color: #6a6a6a; text-align: center; margin-top: 16px; }
+  .finish-btn:active { transform: scale(0.98); box-shadow: 0 3px 10px -4px rgba(232,134,58,0.5); }
+
+  .empty, .progress-empty { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; padding: 4px 2px; }
+
+  .progress-item { margin-bottom: 14px; border-radius: var(--radius); padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); }
+  .progress-item .name { font-size: 13.5px; font-weight: 650; margin-bottom: 3px; color: var(--text); }
+  .progress-item .stat { font-size: 11.5px; color: var(--text-dim); margin-bottom: 6px; }
+  .progress-item .stat b { color: var(--blue); font-weight: 700; }
+  .progress-item .range { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+  .progress-chart { width: 100%; height: 72px; display: block; }
+
+  .session { border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; background: var(--surface); border: 1px solid var(--line); }
+  .session .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+  .session .top .daychip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--text); }
+  .session .top .daychip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--dayColor, var(--amber)); }
+  .session .top span.date { font-size: 11.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+  .session .line { font-size: 12px; color: var(--text-dim); margin-bottom: 3px; line-height: 1.4; }
+
+  h3 { font-size: 13.5px; font-weight: 700; margin: 4px 0 10px; color: var(--text); }
+
+  .footer { font-size: 11px; color: var(--text-faint); text-align: center; margin-top: 20px; line-height: 1.5; }
 </style>
 </head>
 <body>
 
-<h2>Трекер тренировок</h2>
-<p class="sub">A/B/C сплит · без осевой нагрузки на позвоночник</p>
+<header>
+  <h2>Трекер тренировок</h2>
+  <p class="sub">A/B/C сплит без осевой нагрузки на позвоночник</p>
+</header>
 
 <div class="tabs">
   <button class="tab-btn active" id="tabWorkout">Тренировка</button>
@@ -86,12 +133,12 @@
 </div>
 
 <div id="viewProgress" style="display:none;">
-  <div id="progressEmpty" class="progress-empty" style="display:none;">Пока нет данных для графиков — заполни вес хотя бы в одной тренировке и нажми "Завершить".</div>
+  <div id="progressEmpty" class="progress-empty" style="display:none;">Пока нет данных для графиков. Заполни вес хотя бы в одной тренировке и нажми «Завершить» — график появится здесь.</div>
   <div id="progressList"></div>
 </div>
 
 <div id="viewHistory" style="display:none;">
-  <div id="emptyMsg" class="empty" style="display:none;">Пока нет сохранённых тренировок. Заполни день и нажми "Завершить".</div>
+  <div id="emptyMsg" class="empty" style="display:none;">Пока нет сохранённых тренировок. Заполни день и нажми «Завершить».</div>
   <h3 id="sessionsTitle" style="display:none;">Сессии</h3>
   <div id="sessionsList"></div>
 </div>
@@ -99,6 +146,8 @@
 <p class="footer">История сохраняется на этом устройстве (localStorage) и не пропадёт при перезакрытии Safari.</p>
 
 <script>
+const DAY_COLORS = { A: "#e8863a", B: "#4f8ff0", C: "#39b787" };
+
 const PROGRAM = {
   A: { label: "День A · Вторник", exercises: [
     { id: "a1", name: "Жим ногами (широкая постановка)", sets: 4, reps: "15-20", rest: "90 сек", hint: "" },
@@ -163,7 +212,12 @@ function renderDayButtons() {
   wrap.innerHTML = "";
   DAY_KEYS.forEach(d => {
     const btn = document.createElement("button");
+    const c = DAY_COLORS[d];
     btn.className = "day-btn" + (d === day ? " active" : "");
+    btn.style.setProperty("--dayColor", c);
+    btn.style.background = d === day ? c + "26" : "";
+    btn.style.borderColor = d === day ? c : "";
+    btn.style.color = d === day ? "#fff" : "";
     btn.textContent = PROGRAM[d].label.split(" · ")[0];
     btn.onclick = () => { day = d; log = emptyLog(PROGRAM[day].exercises); renderWorkout(); };
     wrap.appendChild(btn);
@@ -174,9 +228,11 @@ function renderDayButtons() {
 function renderExercises() {
   const wrap = document.getElementById("exerciseList");
   wrap.innerHTML = "";
+  const dayColor = DAY_COLORS[day];
   PROGRAM[day].exercises.forEach(ex => {
     const div = document.createElement("div");
     div.className = "exercise";
+    div.style.setProperty("--dayColor", dayColor);
     div.innerHTML = `
       <div class="ex-head"><strong>${ex.name}</strong><span>${ex.rest}</span></div>
       <div class="ex-meta">${ex.sets}×${ex.reps}${ex.hint ? " · ориентир " + ex.hint : ""}</div>
@@ -234,7 +290,7 @@ function progressFor(exId) {
 }
 
 function lineChartSVG(points) {
-  const W = 300, H = 70, padX = 8, padY = 10;
+  const W = 300, H = 72, padX = 8, padY = 12;
   const vals = points.map(p => p.max);
   const min = Math.min(...vals), max = Math.max(...vals);
   const span = max - min || 1;
@@ -244,13 +300,21 @@ function lineChartSVG(points) {
     const y = H - padY - ((p.max - min) / span) * (H - padY * 2);
     return { x, y, p };
   });
-  const path = coords.map((c, i) => (i === 0 ? "M" : "L") + c.x.toFixed(1) + "," + c.y.toFixed(1)).join(" ");
+  const linePath = coords.map((c, i) => (i === 0 ? "M" : "L") + c.x.toFixed(1) + "," + c.y.toFixed(1)).join(" ");
+  const areaPath = linePath + ` L${coords[coords.length-1].x.toFixed(1)},${H} L${coords[0].x.toFixed(1)},${H} Z`;
   const dots = coords.map(c =>
-    `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="#5b8def"><title>${c.p.date}: ${c.p.max}кг</title></circle>` +
-    `<text x="${c.x.toFixed(1)}" y="${(c.y - 8).toFixed(1)}" font-size="9" fill="#c8c8c8" text-anchor="middle">${c.p.max}</text>`
+    `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="#4f8ff0"><title>${c.p.date}: ${c.p.max}кг</title></circle>` +
+    `<text x="${c.x.toFixed(1)}" y="${(c.y - 8).toFixed(1)}" font-size="9.5" fill="#c8c8c8" text-anchor="middle" font-family="ui-monospace, monospace">${c.p.max}</text>`
   ).join("");
   return `<svg class="progress-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-    <path d="${path}" fill="none" stroke="#5b8def" stroke-width="2" vector-effect="non-scaling-stroke"/>
+    <defs>
+      <linearGradient id="grad-${points[0].date.replace(/\D/g,"")}-${points.length}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4f8ff0" stop-opacity="0.28"/>
+        <stop offset="100%" stop-color="#4f8ff0" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaPath}" fill="url(#grad-${points[0].date.replace(/\D/g,"")}-${points.length})" stroke="none"/>
+    <path d="${linePath}" fill="none" stroke="#4f8ff0" stroke-width="2" vector-effect="non-scaling-stroke"/>
     ${dots}
   </svg>`;
 }
@@ -295,13 +359,14 @@ function renderHistory() {
   history.forEach(sess => {
     const div = document.createElement("div");
     div.className = "session";
+    div.style.setProperty("--dayColor", DAY_COLORS[sess.day] || DAY_COLORS.A);
     let lines = "";
     Object.entries(sess.log).forEach(([exId, sets]) => {
       const filled = sets.filter(s => s.weight !== "" || s.reps !== "");
       if (!filled.length) return;
       lines += `<div class="line">${exNameById(exId)}: ${filled.map(s => `${s.weight||"-"}×${s.reps||"-"}`).join(", ")}</div>`;
     });
-    div.innerHTML = `<div class="top"><strong>${sess.dayLabel}</strong><span>${sess.date}</span></div>${lines}`;
+    div.innerHTML = `<div class="top"><span class="daychip">${sess.dayLabel.split(" · ")[0]}</span><span class="date">${sess.date}</span></div>${lines}`;
     sessionsList.appendChild(div);
   });
 }
