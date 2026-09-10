@@ -77,16 +77,18 @@
     margin-bottom: 12px; border-radius: var(--radius); padding: 12px 12px 10px 14px;
     background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--dayColor, var(--amber));
   }
-  .ex-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 5px; }
-  .ex-icon {
-    flex-shrink: 0; width: 44px; height: 44px; border-radius: 10px;
-    background: var(--surface-2); display: flex; align-items: center; justify-content: center;
+  .ex-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+  .ex-diagram {
+    flex-shrink: 0; width: 92px; height: 124px; border-radius: 10px;
+    background: var(--surface-2); display: flex; align-items: center; justify-content: center; padding: 4px;
   }
-  .ex-head-text { flex: 1; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .ex-head strong { font-size: 14px; font-weight: 650; color: var(--text); line-height: 1.25; }
-  .ex-head span { flex-shrink: 0; font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-  .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
-  .ex-muscle { font-size: 11px; color: var(--text-faint); margin-bottom: 10px; }
+  .ex-diagram svg { width: 100%; height: 100%; display: block; }
+  .ex-head-text { flex: 1; min-width: 0; padding-top: 1px; }
+  .ex-name-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+  .ex-name-row strong { font-size: 14px; font-weight: 650; color: var(--text); line-height: 1.3; }
+  .ex-name-row span { flex-shrink: 0; font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+  .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+  .ex-muscle { font-size: 11px; color: var(--text-faint); line-height: 1.4; }
   .ex-muscle b { color: var(--text-dim); font-weight: 600; }
   .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
   .grid-row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 6px; margin-bottom: 5px; }
@@ -167,30 +169,45 @@ const DAY_COLORS = { A: "#e8863a", B: "#4f8ff0", C: "#39b787" };
 /* Схема тела с подсветкой рабочих мышечных групп (силуэт сбоку, лицом вправо:
    зоны ближе к "переду" — грудь/пресс/бицепс/квадрицепс, зоны ближе к "спине" — 
    спина/трицепс/бицепс бедра/икры/ягодицы). Не фото — собственная отрисовка. */
-const BODY_BASE = `<circle cx="16" cy="7" r="3.3" fill="#35353c"/><rect x="12" y="10.5" width="8" height="12" rx="3.5" fill="#35353c"/><rect x="19" y="13" width="3" height="11" rx="1.5" fill="#35353c"/><rect x="12.5" y="22" width="6" height="15" rx="3" fill="#35353c"/><rect x="12" y="37" width="6" height="2" rx="1" fill="#35353c"/>`;
-const MUSCLE_ZONES = {
-  chest: 'cx="18.5" cy="14" rx="2.3" ry="2.6"',
-  abs: 'cx="18" cy="19.5" rx="2" ry="2.8"',
-  upperBack: 'cx="13.5" cy="13" rx="2" ry="2.6"',
-  shoulders: 'cx="19.5" cy="11.5" rx="2.1" ry="2.1"',
-  biceps: 'cx="21.3" cy="16.5" rx="1.6" ry="2.2"',
-  triceps: 'cx="19.3" cy="16.5" rx="1.4" ry="2.2"',
-  forearm: 'cx="20.5" cy="21.5" rx="1.6" ry="2.4"',
-  glutes: 'cx="13" cy="22.5" rx="2.3" ry="2.3"',
-  quads: 'cx="17" cy="26" rx="2.2" ry="3.3"',
-  hamstrings: 'cx="13.5" cy="26" rx="1.8" ry="3.3"',
-  calves: 'cx="13.5" cy="33.5" rx="1.8" ry="2.6"',
+const SKELETON = `<circle cx="110" cy="38" r="14" fill="#2c2c33"/><path d="M85,58 L135,58 L142,95 L128,140 L138,150 L82,150 L92,140 L78,95 Z" fill="#1e1e23" stroke="#2c2c33" stroke-width="1"/><path d="M87,64 L62,100 L55,150" fill="none" stroke="#2c2c33" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="M133,64 L158,100 L165,150" fill="none" stroke="#2c2c33" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="M97,150 L92,215 L88,280" fill="none" stroke="#2c2c33" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M123,150 L128,215 L132,280" fill="none" stroke="#2c2c33" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>`;
+const FRONT_ZONES = {
+  shoulders: [{c:"circle",cx:87,cy:68,r:9},{c:"circle",cx:133,cy:68,r:9}],
+  chest: [{c:"ellipse",cx:97,cy:85,rx:13,ry:11},{c:"ellipse",cx:123,cy:85,rx:13,ry:11}],
+  biceps: [{c:"ellipse",cx:68,cy:88,rx:7,ry:10},{c:"ellipse",cx:152,cy:88,rx:7,ry:10}],
+  forearm: [{c:"ellipse",cx:58,cy:125,rx:6,ry:14},{c:"ellipse",cx:162,cy:125,rx:6,ry:14}],
+  quads: [{c:"ellipse",cx:95,cy:200,rx:8,ry:16},{c:"ellipse",cx:125,cy:200,rx:8,ry:16}],
+};
+const BACK_ZONES = {
+  shoulders: [{c:"circle",cx:87,cy:68,r:9},{c:"circle",cx:133,cy:68,r:9}],
+  upperBack: [{c:"ellipse",cx:110,cy:80,rx:18,ry:15}],
+  triceps: [{c:"ellipse",cx:62,cy:90,rx:7,ry:11},{c:"ellipse",cx:158,cy:90,rx:7,ry:11}],
+  forearm: [{c:"ellipse",cx:58,cy:127,rx:6,ry:14},{c:"ellipse",cx:162,cy:127,rx:6,ry:14}],
+  glutes: [{c:"ellipse",cx:110,cy:148,rx:16,ry:10}],
+  hamstrings: [{c:"ellipse",cx:97,cy:202,rx:8,ry:16},{c:"ellipse",cx:123,cy:202,rx:8,ry:16}],
+  calves: [{c:"ellipse",cx:90,cy:257,rx:7,ry:15},{c:"ellipse",cx:130,cy:257,rx:7,ry:15}],
+};
+const MUSCLE_COLORS = {
+  chest: "#ef6a63", shoulders: "#b08df2", biceps: "#f2789f", forearm: "#5fb8ef",
+  quads: "#3fd0c2", upperBack: "#54c26b", triceps: "#d1615c",
+  glutes: "#ef6a63", hamstrings: "#f0c268", calves: "#3fd0c2",
 };
 const MUSCLE_NAMES = {
-  chest: "грудь", abs: "пресс", upperBack: "спина", shoulders: "плечи",
+  chest: "грудь", upperBack: "спина", shoulders: "плечи",
   biceps: "бицепс", triceps: "трицепс", forearm: "предплечье", glutes: "ягодицы",
   quads: "квадрицепс", hamstrings: "бицепс бедра", calves: "икры",
 };
-function bodyIcon(primary, secondary) {
+function renderZone(shapes, color, opacity) {
+  return shapes.map(s => {
+    if (s.c === "circle") return `<circle cx="${s.cx}" cy="${s.cy}" r="${s.r}" fill="${color}" fill-opacity="${opacity}"/>`;
+    return `<ellipse cx="${s.cx}" cy="${s.cy}" rx="${s.rx}" ry="${s.ry}" fill="${color}" fill-opacity="${opacity}"/>`;
+  }).join("");
+}
+function bodyDiagram(view, primary, secondary) {
+  const zones = view === "back" ? BACK_ZONES : FRONT_ZONES;
   let overlay = "";
-  if (secondary && MUSCLE_ZONES[secondary]) overlay += `<ellipse ${MUSCLE_ZONES[secondary]} fill="var(--dayColor)" fill-opacity="0.4"/>`;
-  if (primary && MUSCLE_ZONES[primary]) overlay += `<ellipse ${MUSCLE_ZONES[primary]} fill="var(--dayColor)"/>`;
-  return `<svg viewBox="0 0 40 40" width="30" height="30">${BODY_BASE}${overlay}</svg>`;
+  if (secondary && zones[secondary]) overlay += renderZone(zones[secondary], MUSCLE_COLORS[secondary], 0.5);
+  if (primary && zones[primary]) overlay += renderZone(zones[primary], MUSCLE_COLORS[primary], 1);
+  return `<svg viewBox="0 0 220 300" preserveAspectRatio="xMidYMid meet">${SKELETON}${overlay}</svg>`;
 }
 function muscleLabel(primary, secondary) {
   const parts = [];
@@ -199,15 +216,30 @@ function muscleLabel(primary, secondary) {
   return parts.join(", ");
 }
 const EX_MUSCLES = {
-  a1: ["quads", "glutes"], a2: ["upperBack", "biceps"], a3: ["chest", "triceps"],
-  a4: ["hamstrings", null], a5: ["upperBack", "biceps"], a6: ["shoulders", null],
-  a7: ["calves", null], a8: ["forearm", null],
-  b1: ["quads", "glutes"], b2: ["upperBack", "biceps"], b3: ["chest", "triceps"],
-  b4: ["quads", null], b5: ["upperBack", "biceps"], b6: ["shoulders", "triceps"],
-  b7: ["calves", null], b8: ["forearm", null],
-  c1: ["glutes", "hamstrings"], c2: ["upperBack", "biceps"], c3: ["chest", null],
-  c4: ["hamstrings", null], c5: ["biceps", null], c6: ["triceps", null],
-  c7: ["calves", null], c8: ["forearm", "upperBack"],
+  a1: { view: "front", primary: "quads", secondary: "glutes" },
+  a2: { view: "back", primary: "upperBack", secondary: "biceps" },
+  a3: { view: "front", primary: "chest", secondary: "triceps" },
+  a4: { view: "back", primary: "hamstrings", secondary: null },
+  a5: { view: "back", primary: "upperBack", secondary: "biceps" },
+  a6: { view: "front", primary: "shoulders", secondary: null },
+  a7: { view: "back", primary: "calves", secondary: null },
+  a8: { view: "front", primary: "forearm", secondary: null },
+  b1: { view: "front", primary: "quads", secondary: "glutes" },
+  b2: { view: "back", primary: "upperBack", secondary: "biceps" },
+  b3: { view: "front", primary: "chest", secondary: "triceps" },
+  b4: { view: "front", primary: "quads", secondary: null },
+  b5: { view: "back", primary: "upperBack", secondary: "biceps" },
+  b6: { view: "front", primary: "shoulders", secondary: "triceps" },
+  b7: { view: "back", primary: "calves", secondary: null },
+  b8: { view: "back", primary: "forearm", secondary: null },
+  c1: { view: "back", primary: "glutes", secondary: "hamstrings" },
+  c2: { view: "back", primary: "upperBack", secondary: "biceps" },
+  c3: { view: "front", primary: "chest", secondary: null },
+  c4: { view: "back", primary: "hamstrings", secondary: null },
+  c5: { view: "front", primary: "biceps", secondary: null },
+  c6: { view: "back", primary: "triceps", secondary: null },
+  c7: { view: "back", primary: "calves", secondary: null },
+  c8: { view: "back", primary: "forearm", secondary: "upperBack" },
 };
 
 const PROGRAM = {
@@ -295,13 +327,16 @@ function renderExercises() {
     const div = document.createElement("div");
     div.className = "exercise";
     div.style.setProperty("--dayColor", dayColor);
+    const m = EX_MUSCLES[ex.id] || {};
     div.innerHTML = `
       <div class="ex-head">
-        <div class="ex-icon">${bodyIcon(...(EX_MUSCLES[ex.id] || []))}</div>
-        <div class="ex-head-text"><strong>${ex.name}</strong><span>${ex.rest}</span></div>
+        <div class="ex-diagram">${bodyDiagram(m.view, m.primary, m.secondary)}</div>
+        <div class="ex-head-text">
+          <div class="ex-name-row"><strong>${ex.name}</strong><span>${ex.rest}</span></div>
+          <div class="ex-meta">${ex.sets}×${ex.reps}${ex.hint ? " · ориентир " + ex.hint : ""}</div>
+          <div class="ex-muscle">Целевые мышцы: ${muscleLabel(m.primary, m.secondary)}</div>
+        </div>
       </div>
-      <div class="ex-meta">${ex.sets}×${ex.reps}${ex.hint ? " · ориентир " + ex.hint : ""}</div>
-      <div class="ex-muscle">Целевые мышцы: ${muscleLabel(...(EX_MUSCLES[ex.id] || []))}</div>
       <div class="grid-head"><span>#</span><span>кг</span><span>повторы</span></div>
     `;
     log[ex.id].forEach((s, i) => {
