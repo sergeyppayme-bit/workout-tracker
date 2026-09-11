@@ -169,6 +169,10 @@
   .pick-ex-btn:active { border-color: var(--dayColor, var(--amber)); }
   .pick-ex-name { font-size: 8px; color: var(--text); line-height: 1.6; }
   .pick-ex-muscle { font-size: 6.5px; color: var(--text-faint); line-height: 1.6; }
+
+  .confirm-text { font-size: 8px; color: var(--text); line-height: 1.9; margin-bottom: 18px; text-align: left; }
+  .confirm-actions { display: flex; gap: 8px; }
+  .confirm-actions button { flex: 1; margin: 0; padding: 12px 0; }
   .copy-btn:active { background: var(--dayColor, var(--amber)); color: #1a0f05; box-shadow: 0 0 12px var(--dayColor, var(--amber)); }
   .grid-row input {
     padding: 8px 6px; border-radius: 8px; border: 1px solid var(--line);
@@ -317,6 +321,16 @@
     <div class="modal-title" style="text-align: center;">Добавить упражнение</div>
     <div id="addExerciseList" style="overflow-y: auto; margin: 6px 0 14px;"></div>
     <button type="button" class="export-btn" onclick="closeAddExercisePicker()">Закрыть</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-card" style="max-width: 320px;">
+    <div class="confirm-text" id="confirmText"></div>
+    <div class="confirm-actions">
+      <button type="button" class="export-btn" id="confirmCancelBtn">Отменить</button>
+      <button type="button" class="finish-btn" id="confirmOkBtn">OK</button>
+    </div>
   </div>
 </div>
 
@@ -503,7 +517,14 @@ function renderDayButtons() {
     btn.textContent = PROGRAM[d].label.split(" · ")[0];
     btn.onclick = () => {
       if (d === day) return;
-      if (hasUnsavedData() && !confirm("В текущей тренировке есть незавершённые данные. Переключить день и потерять их?")) return;
+      if (hasUnsavedData()) {
+        showConfirm("В текущей тренировке есть незавершённые данные. Переключить день и потерять их?", () => {
+          day = d;
+          log = emptyLog(currentDayExercises());
+          renderWorkout();
+        });
+        return;
+      }
       day = d;
       log = emptyLog(currentDayExercises());
       renderWorkout();
@@ -527,11 +548,12 @@ function lastSessionFor(exId) {
 }
 
 function removeExerciseFromDay(exId) {
-  if (!confirm(`Убрать «${exNameById(exId)}» из этого дня? История по нему сохранится.`)) return;
-  dayTemplates[day] = dayTemplates[day].filter(id => id !== exId);
-  saveTemplates();
-  delete log[exId];
-  renderExercises();
+  showConfirm(`Убрать «${exNameById(exId)}» из этого дня? История по нему сохранится.`, () => {
+    dayTemplates[day] = dayTemplates[day].filter(id => id !== exId);
+    saveTemplates();
+    delete log[exId];
+    renderExercises();
+  });
 }
 
 function openAddExercisePicker() {
@@ -552,6 +574,21 @@ function openAddExercisePicker() {
 function closeAddExercisePicker() {
   document.getElementById("addExerciseModal").classList.remove("show");
 }
+let confirmCallback = null;
+function showConfirm(message, onConfirm) {
+  document.getElementById("confirmText").textContent = message;
+  confirmCallback = onConfirm;
+  document.getElementById("confirmModal").classList.add("show");
+}
+document.getElementById("confirmCancelBtn").onclick = () => {
+  document.getElementById("confirmModal").classList.remove("show");
+  confirmCallback = null;
+};
+document.getElementById("confirmOkBtn").onclick = () => {
+  document.getElementById("confirmModal").classList.remove("show");
+  if (confirmCallback) confirmCallback();
+  confirmCallback = null;
+};
 function addExerciseToDay(exId) {
   dayTemplates[day].push(exId);
   saveTemplates();
