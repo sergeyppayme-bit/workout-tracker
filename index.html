@@ -40,13 +40,13 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; background: var(--bg); }
   body {
-    font-family: -apple-system, system-ui, sans-serif;
+    font-family: 'Press Start 2P', -apple-system, system-ui, sans-serif;
     color: var(--text);
     padding: max(14px, env(safe-area-inset-top)) 14px calc(36px + env(safe-area-inset-bottom));
     max-width: 480px;
     margin: 0 auto;
     -webkit-font-smoothing: antialiased;
-    line-height: 1.4;
+    line-height: 1.6;
     overflow-wrap: break-word;
     word-break: normal;
   }
@@ -74,7 +74,7 @@
     color: #ff2e88;
     text-shadow: 0 0 6px #ff2e88, 0 0 14px #ff2e88, 0 0 28px rgba(255,46,136,0.7), 0 0 46px rgba(255,46,136,0.4);
   }
-  p.sub { position: relative; font-size: 13px; color: var(--text-dim); margin: 0; }
+  p.sub { position: relative; font-size: 8px; color: var(--text-dim); margin: 0; }
 
   /* segmented tabs */
   .tabs {
@@ -83,8 +83,8 @@
     border: 1px solid var(--line);
   }
   .tab-btn {
-    padding: 9px 2px; border-radius: 9px; border: none; background: transparent;
-    color: var(--text-dim); font-weight: 700; font-size: 12.5px; letter-spacing: 0.02em;
+    padding: 10px 2px; border-radius: 9px; border: none; background: transparent;
+    color: var(--text-dim); font-weight: 400; font-size: 7.5px; letter-spacing: 0;
     transition: background .18s, color .18s, box-shadow .18s;
   }
   .tab-btn.active { background: var(--surface-2); color: #fff; box-shadow: 0 0 0 1px var(--amber), 0 0 12px rgba(255,46,136,0.45); }
@@ -92,13 +92,13 @@
   /* day selector */
   .days { display: flex; gap: 6px; margin-bottom: 4px; }
   .day-btn {
-    flex: 1; padding: 9px 2px; border-radius: 10px; font-weight: 700; font-size: 13px;
+    flex: 1; padding: 10px 2px; border-radius: 10px; font-weight: 400; font-size: 8px;
     background: var(--surface); color: var(--text-dim); border: 1px solid var(--line);
     transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
   }
   .day-btn.active { color: #fff; }
 
-  p.daylabel { font-size: 12.5px; color: var(--text-dim); margin: 10px 0 14px; }
+  p.daylabel { font-size: 8px; color: var(--text-dim); margin: 12px 0 14px; }
 
   .exercise {
     margin-bottom: 12px; border-radius: var(--radius); padding: 12px 12px 10px 14px;
@@ -119,75 +119,75 @@
   .ex-diagram svg { width: 100%; height: 100%; display: block; }
   .ex-head-text { flex: 1; min-width: 0; padding-top: 1px; }
   .ex-name-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 5px; }
-  .ex-name-row strong { font-size: 14px; font-weight: 650; color: var(--text); line-height: 1.3; }
-  .ex-name-row span { flex-shrink: 0; font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-  .ex-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
-  .ex-muscle { font-size: 11px; color: var(--text-faint); line-height: 1.4; }
-  .ex-muscle b { color: var(--text-dim); font-weight: 600; }
-  .grid-head { display: grid; grid-template-columns: 20px 1fr 1fr 40px 34px; gap: 5px; font-size: 10.5px; color: var(--text-faint); margin-bottom: 5px; text-transform: none; }
-  .grid-row { display: grid; grid-template-columns: 20px 1fr 1fr 40px 34px; gap: 5px; margin-bottom: 5px; align-items: center; }
-  .grid-row span { font-size: 12.5px; align-self: center; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .ex-name-row strong { font-size: 9px; font-weight: 400; color: var(--text); line-height: 1.6; }
+  .ex-name-row span { flex-shrink: 0; font-size: 7.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+  .ex-meta { font-size: 8px; color: var(--text-dim); margin-bottom: 6px; }
+  .ex-muscle { font-size: 7.5px; color: var(--text-faint); line-height: 1.6; }
+  .ex-muscle b { color: var(--text-dim); font-weight: 400; }
+  .grid-head { display: grid; grid-template-columns: 20px 1fr 1fr 40px 34px; gap: 5px; font-size: 7px; color: var(--text-faint); margin-bottom: 6px; text-transform: none; }
+  .grid-row { display: grid; grid-template-columns: 20px 1fr 1fr 40px 34px; gap: 5px; margin-bottom: 7px; align-items: center; }
+  .grid-row span { font-size: 8px; align-self: center; color: var(--text-dim); font-variant-numeric: tabular-nums; }
   .copy-btn {
     width: 40px; height: 44px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--surface-2); color: var(--text-dim); font-size: 9.5px; font-weight: 600;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; gap: 1px; line-height: 1;
+    background: var(--surface-2); color: var(--text-dim); font-size: 6.5px; font-weight: 400;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; gap: 2px; line-height: 1.3;
   }
-  .copy-btn .arrow { font-size: 12px; }
-  .copy-hint { font-size: 11px; color: var(--text-faint); margin: -2px 0 12px; }
+  .copy-btn .arrow { font-size: 10px; }
+  .copy-hint { font-size: 7.5px; color: var(--text-faint); margin: -1px 0 14px; line-height: 1.6; }
   .del-btn {
     width: 34px; height: 44px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--surface-2); color: var(--text-faint); font-size: 15px;
+    background: var(--surface-2); color: var(--text-faint); font-size: 12px;
     display: flex; align-items: center; justify-content: center; padding: 0;
   }
   .del-btn:active { background: rgba(255,77,77,0.18); border-color: #ff4d4d; color: #ff4d4d; }
   .add-set-btn {
-    width: 100%; padding: 10px 0; margin-top: 2px; margin-bottom: 10px;
+    width: 100%; padding: 11px 0; margin-top: 2px; margin-bottom: 10px;
     border-radius: 8px; border: 1px dashed var(--line); background: transparent;
-    color: var(--text-dim); font-weight: 600; font-size: 12.5px;
+    color: var(--text-dim); font-weight: 400; font-size: 8px;
   }
   .add-set-btn:active { border-color: var(--dayColor, var(--amber)); color: var(--text); }
   .copy-btn:active { background: var(--dayColor, var(--amber)); color: #1a0f05; box-shadow: 0 0 12px var(--dayColor, var(--amber)); }
   .grid-row input {
-    padding: 8px; border-radius: 8px; border: 1px solid var(--line);
+    padding: 8px 6px; border-radius: 8px; border: 1px solid var(--line);
     background: var(--bg); color: var(--text); font-size: 16px; width: 100%;
-    font-variant-numeric: tabular-nums; font-family: ui-monospace, "SF Mono", monospace;
+    font-variant-numeric: tabular-nums; font-family: 'Press Start 2P', -apple-system, sans-serif;
     transition: border-color .15s, box-shadow .15s;
   }
   .grid-row input:focus { outline: none; border-color: var(--dayColor, var(--amber)); box-shadow: 0 0 0 1px var(--dayColor, var(--amber)), 0 0 10px rgba(255,46,136,0.35); }
 
   .finish-btn {
-    width: 100%; padding: 14px 0; border-radius: 12px; border: none;
-    background: linear-gradient(135deg, #ff4fa0, #b81cff); color: #100418; font-weight: 800; font-size: 15px;
-    letter-spacing: 0.02em;
-    margin-top: 6px; margin-bottom: 10px;
+    width: 100%; padding: 16px 0; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #ff4fa0, #b81cff); color: #100418; font-weight: 400; font-size: 9px;
+    letter-spacing: 0;
+    margin-top: 6px; margin-bottom: 10px; line-height: 1.6;
     box-shadow: 0 0 22px rgba(255,46,136,0.55), 0 0 42px rgba(184,28,255,0.3);
     transition: transform .12s, box-shadow .12s;
   }
   .finish-btn:active { transform: scale(0.98); box-shadow: 0 0 14px rgba(255,46,136,0.5); }
   .finish-btn:disabled { opacity: 0.35; box-shadow: none; filter: grayscale(0.6); }
 
-  .ex-last { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
-  .ex-last b { color: var(--text); font-weight: 700; }
+  .ex-last { font-size: 7.5px; color: var(--text-dim); margin-bottom: 6px; line-height: 1.6; }
+  .ex-last b { color: var(--text); font-weight: 400; }
 
-  .empty, .progress-empty { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; padding: 4px 2px; }
+  .empty, .progress-empty { font-size: 8.5px; color: var(--text-dim); line-height: 1.7; padding: 4px 2px; }
 
   .progress-item { margin-bottom: 14px; border-radius: var(--radius); padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); }
-  .progress-item .name { font-size: 13.5px; font-weight: 650; margin-bottom: 3px; color: var(--text); }
-  .progress-item .stat { font-size: 11.5px; color: var(--text-dim); margin-bottom: 6px; }
-  .progress-item .stat b { color: var(--blue); font-weight: 700; text-shadow: 0 0 8px rgba(23,230,230,0.6); }
-  .progress-item .range { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+  .progress-item .name { font-size: 8.5px; font-weight: 400; margin-bottom: 6px; color: var(--text); line-height: 1.6; }
+  .progress-item .stat { font-size: 7.5px; color: var(--text-dim); margin-bottom: 8px; }
+  .progress-item .stat b { color: var(--blue); font-weight: 400; text-shadow: 0 0 8px rgba(23,230,230,0.6); }
+  .progress-item .range { font-size: 7px; color: var(--text-faint); margin-top: 6px; }
   .progress-chart { width: 100%; height: 72px; display: block; }
 
   .session { border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; background: var(--surface); border: 1px solid var(--line); }
-  .session .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
-  .session .top .daychip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--text); }
+  .session .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+  .session .top .daychip { display: inline-flex; align-items: center; gap: 6px; font-size: 8px; font-weight: 400; color: var(--text); }
   .session .top .daychip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--dayColor, var(--amber)); box-shadow: 0 0 8px var(--dayColor, var(--amber)); }
-  .session .top span.date { font-size: 11.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-  .session .line { font-size: 12px; color: var(--text-dim); margin-bottom: 3px; line-height: 1.4; }
+  .session .top span.date { font-size: 7px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+  .session .line { font-size: 7.5px; color: var(--text-dim); margin-bottom: 5px; line-height: 1.7; }
 
-  h3 { font-size: 13.5px; font-weight: 700; margin: 4px 0 10px; color: var(--text); }
+  h3 { font-size: 8.5px; font-weight: 400; margin: 6px 0 12px; color: var(--text); line-height: 1.6; }
 
-  .footer { font-size: 11px; color: var(--text-faint); text-align: center; margin-top: 20px; line-height: 1.5; }
+  .footer { font-size: 7px; color: var(--text-faint); text-align: center; margin-top: 22px; line-height: 1.8; }
 
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(4,0,12,0.75);
@@ -208,13 +208,13 @@
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 0 24px rgba(186,255,41,0.6);
   }
-  .modal-title { font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 8px; text-shadow: 0 0 10px rgba(23,230,230,0.5); }
-  .modal-quote { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; font-style: italic; }
+  .modal-title { font-size: 10px; font-weight: 400; color: #fff; margin-bottom: 10px; text-shadow: 0 0 10px rgba(23,230,230,0.5); line-height: 1.6; }
+  .modal-quote { font-size: 8px; color: var(--text-dim); line-height: 1.8; font-style: italic; }
 
   .export-btn {
-    width: 100%; padding: 11px 0; border-radius: 10px; border: 1px solid var(--line);
-    background: var(--surface-2); color: var(--text); font-weight: 700; font-size: 13px;
-    margin-bottom: 16px;
+    width: 100%; padding: 13px 0; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--text); font-weight: 400; font-size: 8px;
+    margin-bottom: 16px; line-height: 1.6;
   }
   .export-btn:active { background: var(--line); }
 </style>
@@ -618,7 +618,7 @@ function lineChartSVG(points) {
   const areaPath = linePath + ` L${coords[coords.length-1].x.toFixed(1)},${H} L${coords[0].x.toFixed(1)},${H} Z`;
   const dots = coords.map(c =>
     `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" fill="#17e6e6" style="filter:drop-shadow(0 0 4px rgba(23,230,230,0.9))"><title>${c.p.date}: ${c.p.max}кг</title></circle>` +
-    `<text x="${c.x.toFixed(1)}" y="${(c.y - 8).toFixed(1)}" font-size="9.5" fill="#e8e2f5" text-anchor="middle" font-family="ui-monospace, monospace">${c.p.max}</text>`
+    `<text x="${c.x.toFixed(1)}" y="${(c.y - 9).toFixed(1)}" font-size="7" fill="#e8e2f5" text-anchor="middle" font-family="'Press Start 2P', monospace">${c.p.max}</text>`
   ).join("");
   return `<svg class="progress-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
     <defs>
